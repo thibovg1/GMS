@@ -20,15 +20,85 @@ document.addEventListener('DOMContentLoaded', () => {
     // GMS Standaard Instellingen (als er nog geen zijn opgeslagen)
     const defaultGmsSettings = {
         maxAvailableUnits: 25,
-        incidentSpawnChance: 0.3
+        incidentSpawnChance: 0.3,
+        minResponseTime: 60,
+        maxResponseTime: 180,
+        updateFrequency: 5,
+        resolutionChance: 0.05,
+        resolvedRetentionTime: 300,
+        incidentTypes: [
+            { name: 'Brand', urgent: true },
+            { name: 'Verkeersongeval', urgent: true },
+            { name: 'Medisch Noodgeval', urgent: true },
+            { name: 'Inbraak', urgent: false },
+            { name: 'Overval', urgent: true },
+            { name: 'Wateroverlast', urgent: false },
+            { name: 'Natuurbrand', urgent: true }
+        ],
+        // Nieuw: Uiterlijk instellingen
+        primaryColor: '#0d6efd', // Bootstrap primary
+        secondaryColor: '#6c757d', // Bootstrap secondary
+        textColor: '#212529', // Bootstrap body color
+        backgroundImageUrl: '', // Geen standaard achtergrondafbeelding
+        fontSizeBase: 16 // Standaard 16px
     };
 
     // Laad GMS instellingen uit localStorage of gebruik standaardwaarden
     let gmsSettings = JSON.parse(localStorage.getItem('gmsSettings')) || defaultGmsSettings;
+    // Zorg ervoor dat alle nieuwe instellingen aanwezig zijn, zelfs als ze nog niet in localStorage stonden
+    gmsSettings = { ...defaultGmsSettings, ...gmsSettings };
+    // Diepe merge voor incidentTypes, zodat toegevoegde types behouden blijven
+    if (localStorage.getItem('gmsSettings')) {
+        const storedSettings = JSON.parse(localStorage.getItem('gmsSettings'));
+        if (storedSettings.incidentTypes) {
+            const mergedIncidentTypes = [...defaultGmsSettings.incidentTypes];
+            storedSettings.incidentTypes.forEach(storedType => {
+                // Alleen toevoegen als het type nog niet bestaat op basis van naam
+                if (!mergedIncidentTypes.some(defaultType => defaultType.name === storedType.name)) {
+                    mergedIncidentTypes.push(storedType);
+                }
+            });
+            gmsSettings.incidentTypes = mergedIncidentTypes;
+        }
+    }
+
 
     // Functie om GMS instellingen op te slaan
     const saveGmsSettings = () => {
         localStorage.setItem('gmsSettings', JSON.stringify(gmsSettings));
+    };
+
+    // Functie om uiterlijk instellingen toe te passen
+    const applyGmsVisualSettings = () => {
+        const root = document.documentElement; // De <html> tag
+        root.style.setProperty('--bs-primary', gmsSettings.primaryColor);
+        root.style.setProperty('--bs-secondary', gmsSettings.secondaryColor);
+        root.style.setProperty('--bs-body-color', gmsSettings.textColor);
+        root.style.setProperty('font-size', `${gmsSettings.fontSizeBase}px`);
+
+        // Achtergrondafbeelding voor de intranet sectie
+        const intranetSection = document.getElementById('intranet-section');
+        if (intranetSection) {
+            if (gmsSettings.backgroundImageUrl) {
+                intranetSection.style.backgroundImage = `url('${gmsSettings.backgroundImageUrl}')`;
+                intranetSection.style.backgroundSize = 'cover';
+                intranetSection.style.backgroundPosition = 'center';
+                intranetSection.style.backgroundAttachment = 'fixed'; // Optioneel: scrollt niet mee
+            } else {
+                intranetSection.style.backgroundImage = 'none';
+            }
+        }
+
+        // Optioneel: Update navigatiebalk kleur als deze dynamisch moet zijn
+        const navbar = document.querySelector('.navbar');
+        if (navbar) {
+             navbar.style.backgroundColor = gmsSettings.primaryColor; // Voor een simpele aanpassing
+             navbar.classList.remove('navbar-dark', 'bg-primary'); // Verwijder Bootstrap standaardklassen indien nodig
+             navbar.style.setProperty('color', gmsSettings.textColor); // Tekstkleur voor navbar
+        }
+        // Voor de knoppen en andere elementen die Bootstrap variabelen gebruiken,
+        // zou je CSS variabelen moeten overschrijven of specifieke klassen maken.
+        // Voor deze demo volstaat het aanpassen van de root-variabelen vaak.
     };
 
 
@@ -59,11 +129,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Voorbeeld data voor meldingen (deze blijft lokaal)
         let incidents = [
-            { id: 'M-001', type: 'Brand', location: 'Dorpsstraat 10, Herentals', status: 'new', time: '17:05' },
-            { id: 'M-002', type: 'Verkeersongeval', location: 'E313 Afrit 22', status: 'in-progress', time: '17:15' },
-            { id: 'M-003', type: 'Medisch Noodgeval', location: 'Koning Albertlaan 5, Geel', status: 'resolved', time: '16:50' },
-            { id: 'M-004', type: 'Inbraak', location: 'Stationsplein 1, Lier', status: 'new', time: '17:25' }
+            { id: 'M-001', type: 'Brand', location: 'Dorpsstraat 10, Herentals', status: 'new', time: '17:05', spawnTime: Date.now() - 30000, urgent: true },
+            { id: 'M-002', type: 'Verkeersongeval', location: 'E313 Afrit 22', status: 'in-progress', time: '17:15', spawnTime: Date.now() - 90000, urgent: true },
+            { id: 'M-003', type: 'Medisch Noodgeval', location: 'Koning Albertlaan 5, Geel', status: 'resolved', time: '16:50', spawnTime: Date.now() - 120000, urgent: true, resolvedTime: Date.now() - 60000 },
+            { id: 'M-004', type: 'Inbraak', location: 'Stationsplein 1, Lier', status: 'new', time: '17:25', spawnTime: Date.now() - 10000, urgent: false }
         ];
+
+        // Pas direct bij laden de visuele instellingen toe
+        applyGmsVisualSettings();
+
 
         // --- Inlog Functionaliteit ---
         loginForm.addEventListener('submit', (e) => {
@@ -91,6 +165,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     showSection('intranet-dashboard'); // Toon standaard het dashboard na inloggen
                     initializeGMS(); // Initialiseer GMS functionaliteit na inloggen
+
+                    // BELANGRIJK: Laad de admin UI's alleen wanneer het admin-paneel wordt getoond
+                    // We kunnen dit koppelen aan de klik op de admin-panel nav-link
+                    // of direct bij het laden van de pagina als admin is ingelogd
+                    if (currentUser.role === 'admin') {
+                         loadGmsSettingsIntoForm();
+                         renderIncidentTypes();
+                         renderUserManagement();
+                    }
+
                 } else if (user.status === 'pending') {
                     loginError.textContent = 'Uw account is in afwachting van goedkeuring door een beheerder.';
                     loginError.classList.remove('d-none');
@@ -138,6 +222,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sectionId = e.target.dataset.section || e.target.closest('a').dataset.section;
                 if (sectionId) { 
                     showSection(sectionId);
+                    // Specifieke acties bij het tonen van het admin-paneel
+                    if (sectionId === 'admin-panel' && currentUser && currentUser.role === 'admin') {
+                        loadGmsSettingsIntoForm();
+                        renderIncidentTypes();
+                        renderUserManagement();
+                    }
                 }
             });
         });
@@ -154,13 +244,19 @@ document.addEventListener('DOMContentLoaded', () => {
             updateDashboardCounters();
             renderIncidents();
 
+            // Gebruik de nieuwe 'updateFrequency' instelling
             gmsSimulationInterval = setInterval(() => {
+                const now = Date.now();
+
+                // Kans op nieuwe meldingen
                 const newIncidentChance = Math.random();
-                // Gebruik de instelling voor de kans op nieuwe meldingen
                 if (newIncidentChance < gmsSettings.incidentSpawnChance) { 
                     const newId = `M-${String(incidents.length + 1).padStart(3, '0')}`;
-                    const incidentTypes = ['Brand', 'Verkeersongeval', 'Medisch Noodgeval', 'Inbraak', 'Overval'];
-                    const randomType = incidentTypes[Math.floor(Math.random() * incidentTypes.length)];
+                    // Kies een willekeurig incidenttype uit de gmsSettings
+                    const randomTypeObj = gmsSettings.incidentTypes[Math.floor(Math.random() * gmsSettings.incidentTypes.length)];
+                    const randomType = randomTypeObj.name;
+                    const isUrgent = randomTypeObj.urgent;
+
                     const locations = [
                         'Hoofdstraat 123', 'Industriepark 7', 'Marktplein 1', 'Schoolstraat 45', 'Ziekenhuislaan 8'
                     ];
@@ -170,7 +266,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         type: randomType,
                         location: randomLocation,
                         status: 'new',
-                        time: new Date().toLocaleTimeString().substring(0, 5)
+                        time: new Date().toLocaleTimeString().substring(0, 5),
+                        spawnTime: now,
+                        urgent: isUrgent
                     };
                     incidents.unshift(newIncident); 
                     renderIncidents();
@@ -179,26 +277,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     addChatMessage(`Systeem: Nieuwe melding ${newId} - ${newIncident.type} op ${newIncident.location}`, 'Systeem', 'received');
                 }
 
+                // Update statussen van bestaande meldingen en verwijder opgeloste meldingen
+                const incidentsToRemove = [];
                 incidents.forEach(inc => {
-                    if (inc.status === 'new' && Math.random() < 0.1) {
-                        inc.status = 'in-progress';
-                        updateLatestUpdates(`Status update ${inc.id}: ${inc.type} is nu in uitvoering.`);
-                        addChatMessage(`Systeem: Melding ${inc.id} - status gewijzigd naar 'in uitvoering'.`, 'Systeem', 'received');
-                    } else if (inc.status === 'in-progress' && Math.random() < 0.05) {
+                    if (inc.status === 'new') {
+                        const timeSinceSpawn = (now - inc.spawnTime) / 1000; // Tijd in seconden
+                        if (timeSinceSpawn >= gmsSettings.minResponseTime && Math.random() < 0.2) { 
+                            inc.status = 'in-progress';
+                            updateLatestUpdates(`Status update ${inc.id}: ${inc.type} is nu in uitvoering.`);
+                            addChatMessage(`Systeem: Melding ${inc.id} - status gewijzigd naar 'in uitvoering'.`, 'Systeem', 'received');
+                        } else if (timeSinceSpawn >= gmsSettings.maxResponseTime) { 
+                            inc.status = 'in-progress';
+                            updateLatestUpdates(`Status update ${inc.id}: ${inc.type} is nu in uitvoering (automatisch na responstijd limiet).`);
+                            addChatMessage(`Systeem: Melding ${inc.id} - status gewijzigd naar 'in uitvoering'.`, 'Systeem', 'received');
+                        }
+                    } else if (inc.status === 'in-progress' && Math.random() < gmsSettings.resolutionChance) {
                         inc.status = 'resolved';
+                        inc.resolvedTime = now;
                         updateLatestUpdates(`Status update ${inc.id}: ${inc.type} is opgelost.`);
                         addChatMessage(`Systeem: Melding ${inc.id} - status gewijzigd naar 'opgelost'.`, 'Systeem', 'received');
+                    } else if (inc.status === 'resolved') {
+                        const timeSinceResolved = (now - inc.resolvedTime) / 1000;
+                        if (timeSinceResolved >= gmsSettings.resolvedRetentionTime) {
+                            incidentsToRemove.push(inc.id);
+                        }
                     }
                 });
+
+                // Verwijder de incidenten die gemarkeerd zijn om te verwijderen
+                incidents = incidents.filter(inc => !incidentsToRemove.includes(inc.id));
+
                 renderIncidents(); 
                 updateDashboardCounters(); 
-            }, 5000); 
+            }, gmsSettings.updateFrequency * 1000); // Interval in milliseconden
         };
 
         const updateDashboardCounters = () => {
             const activeCount = incidents.filter(inc => inc.status === 'new' || inc.status === 'in-progress').length;
-            const urgentCount = incidents.filter(inc => ['Brand', 'Medisch Noodgeval', 'Verkeersongeval'].includes(inc.type)).length;
-            // Gebruik de instelling voor het maximaal aantal beschikbare eenheden
+            const urgentCount = incidents.filter(inc => inc.urgent && (inc.status === 'new' || inc.status === 'in-progress')).length; 
             const availableUnits = Math.floor(Math.random() * gmsSettings.maxAvailableUnits) + 5; 
 
             activeIncidentsCount.textContent = activeCount;
@@ -214,8 +330,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            incidents.forEach(incident => {
+            // Sorteer meldingen: Nieuwste eerst, dan 'new', dan 'in-progress', dan 'resolved'
+            const sortedIncidents = [...incidents].sort((a, b) => {
+                const statusOrder = { 'new': 1, 'in-progress': 2, 'resolved': 3 };
+                if (statusOrder[a.status] !== statusOrder[b.status]) {
+                    return statusOrder[a.status] - statusOrder[b.status];
+                }
+                return b.spawnTime - a.spawnTime;
+            });
+
+            sortedIncidents.forEach(incident => {
                 const row = incidentsTableBody.insertRow();
+                // Voeg een klasse toe voor urgente meldingen
+                if (incident.urgent) {
+                    row.classList.add('table-danger'); // Bootstrap klasse voor rode rij
+                }
                 row.innerHTML = `
                     <td>${incident.id}</td>
                     <td>${incident.type}</td>
@@ -272,64 +401,48 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // --- Admin Paneel Functionaliteit ---
-        const adminPanelSection = document.getElementById('admin-panel');
-        const manageUsersBtn = document.getElementById('manage-users-btn');
-        const manageGmsBtn = document.getElementById('manage-gms-btn'); // Nieuwe referentie
+        // We verwijderen de knoppen om te wisselen tussen de admin modules,
+        // en zorgen ervoor dat ze direct geladen en zichtbaar zijn.
+        // const manageUsersBtn = document.getElementById('manage-users-btn'); // Niet meer nodig
+        // const manageGmsBtn = document.getElementById('manage-gms-btn');     // Niet meer nodig
         
         // Containers voor de verschillende admin modules
-        const userManagementContainer = document.createElement('div');
-        userManagementContainer.id = 'user-management-container';
-        userManagementContainer.classList.add('mt-4', 'd-none'); // Initieel verborgen
-        adminPanelSection.appendChild(userManagementContainer);
-
-        const gmsSettingsContainer = document.getElementById('gms-settings-container'); // Bestaande container
+        const userManagementContainer = document.getElementById('user-management-container');
+        const gmsSettingsContainer = document.getElementById('gms-settings-container'); 
 
         // Formulieren en inputs voor GMS instellingen
         const gmsSettingsForm = document.getElementById('gms-settings-form');
         const maxAvailableUnitsInput = document.getElementById('max-available-units');
         const incidentSpawnChanceInput = document.getElementById('incident-spawn-chance');
+        const minResponseTimeInput = document.getElementById('min-response-time');
+        const maxResponseTimeInput = document.getElementById('max-response-time');
+        const updateFrequencyInput = document.getElementById('update-frequency');
+        const resolutionChanceInput = document.getElementById('resolution-chance');
+        const resolvedRetentionTimeInput = document.getElementById('resolved-retention-time');
         const gmsSettingsSuccessMessage = document.getElementById('gms-settings-success');
 
+        // Nieuwe elementen voor incident types
+        const incidentTypesList = document.getElementById('incident-types-list');
+        const newIncidentTypeNameInput = document.getElementById('new-incident-type-name');
+        const newIncidentTypeUrgentCheckbox = document.getElementById('new-incident-type-urgent');
+        const addIncidentTypeBtn = document.getElementById('add-incident-type-btn');
 
-        manageUsersBtn.addEventListener('click', () => {
-            if (currentUser && currentUser.role === 'admin') {
-                userManagementContainer.classList.remove('d-none');
-                gmsSettingsContainer.classList.add('d-none'); // Verberg andere module
-                renderUserManagement();
-            } else {
-                alert('U heeft geen toegang tot gebruikersbeheer.');
-            }
-        });
+        // Nieuwe elementen voor uiterlijk instellingen
+        const primaryColorInput = document.getElementById('primary-color');
+        const secondaryColorInput = document.getElementById('secondary-color');
+        const textColorInput = document.getElementById('text-color');
+        const backgroundImageUrlInput = document.getElementById('background-image-url');
+        const fontSizeBaseInput = document.getElementById('font-size-base');
 
-        manageGmsBtn.addEventListener('click', () => {
-            if (currentUser && currentUser.role === 'admin') {
-                gmsSettingsContainer.classList.remove('d-none');
-                userManagementContainer.classList.add('d-none'); // Verberg andere module
-                loadGmsSettingsIntoForm(); // Laad de huidige instellingen in het formulier
-            } else {
-                alert('U heeft geen toegang tot GMS instellingen.');
-            }
-        });
+        // Deze knoppen zijn nu overbodig omdat de secties direct zichtbaar zijn
+        // manageUsersBtn.addEventListener('click', () => { ... });
+        // manageGmsBtn.addEventListener('click', () => { ... });
+
 
         const renderUserManagement = () => {
-            userManagementContainer.innerHTML = `
-                <h4><i class="fas fa-users me-2"></i> Gebruikers Overzicht</h4>
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped">
-                        <thead class="table-dark">
-                            <tr>
-                                <th scope="col">Gebruikersnaam</th>
-                                <th scope="col">Rol</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Acties</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-table-body">
-                            </tbody>
-                    </table>
-                </div>
-            `;
-            const userTableBody = document.getElementById('user-table-body');
+            // Zorg dat de container leeg is voor het opnieuw renderen
+            userManagementContainer.querySelector('#user-table-body').innerHTML = ''; 
+            const userTableBody = userManagementContainer.querySelector('#user-table-body');
             
             // Reload users to get the latest state from localStorage
             users = loadUsers(); 
@@ -420,17 +533,104 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadGmsSettingsIntoForm = () => {
             maxAvailableUnitsInput.value = gmsSettings.maxAvailableUnits;
             incidentSpawnChanceInput.value = gmsSettings.incidentSpawnChance;
+            minResponseTimeInput.value = gmsSettings.minResponseTime;
+            maxResponseTimeInput.value = gmsSettings.maxResponseTime;
+            updateFrequencyInput.value = gmsSettings.updateFrequency;
+            resolutionChanceInput.value = gmsSettings.resolutionChance;
+            resolvedRetentionTimeInput.value = gmsSettings.resolvedRetentionTime;
+            
+            // Laad uiterlijk instellingen
+            primaryColorInput.value = gmsSettings.primaryColor;
+            secondaryColorInput.value = gmsSettings.secondaryColor;
+            textColorInput.value = gmsSettings.textColor;
+            backgroundImageUrlInput.value = gmsSettings.backgroundImageUrl;
+            fontSizeBaseInput.value = gmsSettings.fontSizeBase;
+
             gmsSettingsSuccessMessage.classList.add('d-none'); // Verberg succesbericht
         };
+
+        // Functie om incident types te renderen in het admin paneel
+        const renderIncidentTypes = () => {
+            incidentTypesList.innerHTML = '';
+            gmsSettings.incidentTypes.forEach((type, index) => {
+                const typeDiv = document.createElement('div');
+                typeDiv.classList.add('input-group', 'mb-2');
+                typeDiv.innerHTML = `
+                    <input type="text" class="form-control incident-type-name" value="${type.name}" data-index="${index}" disabled>
+                    <div class="input-group-text">
+                        <input class="form-check-input mt-0 incident-type-urgent" type="checkbox" ${type.urgent ? 'checked' : ''} data-index="${index}" aria-label="Incident type is standaard urgent">
+                        <label class="form-check-label ms-2">Urgent</label>
+                    </div>
+                    <button class="btn btn-outline-danger remove-incident-type-btn" type="button" data-index="${index}"><i class="fas fa-minus me-1"></i> Verwijder</button>
+                `;
+                incidentTypesList.appendChild(typeDiv);
+            });
+
+            // Event listeners voor wijzigen urgentie
+            incidentTypesList.querySelectorAll('.incident-type-urgent').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const index = parseInt(e.target.dataset.index, 10);
+                    gmsSettings.incidentTypes[index].urgent = e.target.checked;
+                    // Opslaan gebeurt bij formulier submit
+                });
+            });
+
+            // Event listeners voor verwijderen
+            incidentTypesList.querySelectorAll('.remove-incident-type-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index, 10);
+                    if (confirm(`Weet u zeker dat u het incident type "${gmsSettings.incidentTypes[index].name}" wilt verwijderen?`)) {
+                        gmsSettings.incidentTypes.splice(index, 1);
+                        renderIncidentTypes(); // Herteken de lijst
+                        // Opslaan gebeurt bij formulier submit
+                    }
+                });
+            });
+        };
+
+        // Event listener voor toevoegen incident type
+        addIncidentTypeBtn.addEventListener('click', () => {
+            const name = newIncidentTypeNameInput.value.trim();
+            const urgent = newIncidentTypeUrgentCheckbox.checked;
+
+            if (name === '') {
+                alert('Voer een naam in voor het nieuwe incident type.');
+                return;
+            }
+            if (gmsSettings.incidentTypes.some(type => type.name.toLowerCase() === name.toLowerCase())) {
+                alert(`Het incident type "${name}" bestaat al.`);
+                return;
+            }
+
+            gmsSettings.incidentTypes.push({ name: name, urgent: urgent });
+            newIncidentTypeNameInput.value = '';
+            newIncidentTypeUrgentCheckbox.checked = false;
+            renderIncidentTypes(); // Herteken de lijst
+            // Opslaan gebeurt bij formulier submit
+        });
+
 
         // Event listener voor GMS instellingen formulier
         gmsSettingsForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
+            // Save simulation settings
             gmsSettings.maxAvailableUnits = parseInt(maxAvailableUnitsInput.value, 10);
             gmsSettings.incidentSpawnChance = parseFloat(incidentSpawnChanceInput.value);
+            gmsSettings.minResponseTime = parseInt(minResponseTimeInput.value, 10);
+            gmsSettings.maxResponseTime = parseInt(maxResponseTimeInput.value, 10);
+            gmsSettings.updateFrequency = parseInt(updateFrequencyInput.value, 10);
+            gmsSettings.resolutionChance = parseFloat(resolutionChanceInput.value);
+            gmsSettings.resolvedRetentionTime = parseInt(resolvedRetentionTimeInput.value, 10);
 
-            // Basic validation
+            // Save visual settings
+            gmsSettings.primaryColor = primaryColorInput.value;
+            gmsSettings.secondaryColor = secondaryColorInput.value;
+            gmsSettings.textColor = textColorInput.value;
+            gmsSettings.backgroundImageUrl = backgroundImageUrlInput.value;
+            gmsSettings.fontSizeBase = parseInt(fontSizeBaseInput.value, 10);
+
+            // Basic validation for simulation settings (already covered in previous steps)
             if (isNaN(gmsSettings.maxAvailableUnits) || gmsSettings.maxAvailableUnits < 1) {
                 alert('Aantal beschikbare eenheden moet een positief getal zijn.');
                 return;
@@ -439,12 +639,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Kans op nieuwe melding moet tussen 0.0 en 1.0 liggen.');
                 return;
             }
+            if (isNaN(gmsSettings.minResponseTime) || gmsSettings.minResponseTime < 5) {
+                alert('Minimale responstijd moet minimaal 5 seconden zijn.');
+                return;
+            }
+            if (isNaN(gmsSettings.maxResponseTime) || gmsSettings.maxResponseTime < gmsSettings.minResponseTime) {
+                alert('Maximale responstijd moet groter of gelijk zijn aan de minimale responstijd.');
+                return;
+            }
+            if (isNaN(gmsSettings.updateFrequency) || gmsSettings.updateFrequency < 1) {
+                alert('Update frequentie moet minimaal 1 seconde zijn.');
+                return;
+            }
+            if (isNaN(gmsSettings.resolutionChance) || gmsSettings.resolutionChance < 0 || gmsSettings.resolutionChance > 1) {
+                alert('Kans dat melding opgelost wordt, moet tussen 0.0 en 1.0 liggen.');
+                return;
+            }
+            if (isNaN(gmsSettings.resolvedRetentionTime) || gmsSettings.resolvedRetentionTime < 0) {
+                alert('Tijd dat opgeloste meldingen zichtbaar blijven moet een positief getal zijn.');
+                return;
+            }
+            if (gmsSettings.incidentTypes.length === 0) {
+                alert('Voeg ten minste één incident type toe.');
+                return;
+            }
+
+            // Basic validation for visual settings
+            // Geen strikte validatie voor kleuren/URL hier, browser zal ongeldige waarden negeren.
+            if (isNaN(gmsSettings.fontSizeBase) || gmsSettings.fontSizeBase < 10 || gmsSettings.fontSizeBase > 24) {
+                alert('Basis lettergrootte moet tussen 10 en 24 pixels liggen.');
+                return;
+            }
+
 
             saveGmsSettings(); // Sla de bijgewerkte instellingen op
+            applyGmsVisualSettings(); // Pas de nieuwe visuele instellingen toe
             gmsSettingsSuccessMessage.classList.remove('d-none');
             
             // Start de GMS simulatie opnieuw met de nieuwe instellingen
-            // Belangrijk: Hierdoor worden de veranderingen meteen van kracht
             initializeGMS(); 
 
             // Verberg het succesbericht na een paar seconden
@@ -453,8 +685,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000);
         });
 
+        // De "Content Beheer" knop blijft bestaan, maar de functionaliteit is nog niet ingebouwd
         document.getElementById('manage-content-btn').addEventListener('click', () => {
-            alert('Navigeren naar Content Beheer');
+            alert('Navigeren naar Content Beheer - Functionaliteit nog niet geïmplementeerd.');
         });
 
 

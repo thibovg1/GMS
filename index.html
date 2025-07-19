@@ -3,16 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inloggen - Intranet Regio 18</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <title>GMS Intranet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjPz2wfQvO3sS/HgejokE/k9CgA/Yj5i5uWz/I4y2f5U1u/B2y3a2s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Aangepaste CSS voor status badges */
+        .status-badge {
+            display: inline-block;
+            padding: .35em .65em;
+            font-size: .75em;
+            font-weight: 700;
+            line-height: 1;
+            color: #fff;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: .375rem;
+        }
+        .status-badge.new { background-color: #0d6efd; } /* Primary blue */
+        .status-badge.in-progress { background-color: #ffc107; color: #000; } /* Warning yellow */
+        .status-badge.resolved { background-color: #198754; } /* Success green */
+        .status-badge.closed { background-color: #6c757d; } /* Secondary grey */
+
+        /* Aangepaste CSS voor chat berichten */
+        #chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: .375rem;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+        .message.sent {
+            text-align: right;
+            margin-left: auto;
+            background-color: #d1e7dd; /* Light green for sent */
+            border-color: #badbcc;
+        }
+        .message.received {
+            text-align: left;
+            margin-right: auto;
+            background-color: #e2e3e5; /* Light grey for received */
+            border-color: #d3d6d8;
+        }
+        .message .sender {
+            font-weight: bold;
+        }
+
+        /* Styling voor actieve navigatielink */
+        .nav-link.active {
+            font-weight: bold;
+            color: var(--bs-primary) !important; /* Gebruik Bootstrap primary variable */
+        }
+
+        /* Standaard styling voor body, kan overschreven worden door JS via CSS variabelen */
+        :root {
+            --bs-primary: #0d6efd; /* Standaard Bootstrap primary */
+            --bs-secondary: #6c757d; /* Standaard Bootstrap secondary */
+            --bs-body-color: #212529; /* Standaard Bootstrap tekstkleur */
+            font-size: 16px; /* Standaard basis lettergrootte */
+        }
+        
+        body {
+            color: var(--bs-body-color); /* Toepassen op body */
+            font-size: var(--font-size); /* Nieuw: voor basis lettergrootte */
+        }
+        
+        .navbar {
+            background-color: var(--bs-primary) !important; /* Navigatiebalk hoofdkleur */
+            color: white !important;
+        }
+
+        .navbar .navbar-brand,
+        .navbar .nav-link {
+            color: white !important;
+        }
+        .navbar .nav-link:hover {
+            color: rgba(255, 255, 255, 0.75) !important;
+        }
+
+        /* Achtergrondafbeelding voor intranet sectie */
+        #intranet-section {
+            background-image: none; /* Standaard geen afbeelding, wordt door JS ingesteld */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: calc(100vh - 56px); /* Zorg dat het minstens de schermhoogte is min navbar */
+        }
+    </style>
 </head>
 <body>
 
-    <div id="login-section" class="d-flex align-items-center justify-content-center vh-100 bg-light">
-        <div class="card p-4 shadow-lg" style="width: 400px;">
-            <h2 class="card-title text-center mb-4">Inloggen op Intranet Regio 18</h2>
+    <section id="login-section" class="vh-100 d-flex align-items-center justify-content-center bg-light">
+        <div class="card p-4 shadow-lg" style="width: 25rem;">
+            <h2 class="card-title text-center mb-4"><i class="fas fa-lock me-2"></i> Inloggen</h2>
             <form id="login-form">
                 <div class="mb-3">
                     <label for="username" class="form-label">Gebruikersnaam</label>
@@ -22,70 +106,97 @@
                     <label for="password" class="form-label">Wachtwoord</label>
                     <input type="password" class="form-control" id="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
-                <div id="login-error" class="text-danger text-center mt-3 d-none">Ongeldige gebruikersnaam of wachtwoord.</div>
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-sign-in-alt me-2"></i> Inloggen</button>
+                <div id="login-error" class="alert alert-danger mt-3 d-none" role="alert"></div>
+                <p class="mt-3 text-center">Nog geen account? <a href="register.html">Registreer hier</a></p>
             </form>
-            <div class="mt-3 text-center">
-                <p>Nog geen account?</p>
-                <a href="register.html" class="btn btn-outline-secondary w-100">Registreren</a>
-            </div>
         </div>
-    </div>
+    </section>
 
-    <div id="intranet-section" class="d-none">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <section id="intranet-section" class="d-none">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Intranet Regio 18</a>
+                <a class="navbar-brand" href="#"><i class="fas fa-satellite-dish me-2"></i> GMS Intranet</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#" data-section="intranet-dashboard"><i class="fas fa-home me-1"></i> Dashboard</a>
+                            <a class="nav-link active" aria-current="page" href="#" data-section="intranet-dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" data-section="gms-module"><i class="fas fa-headset me-1"></i> Meldkamer Systeem</a>
+                            <a class="nav-link" href="#" data-section="incident-list"><i class="fas fa-fire-extinguisher me-2"></i> Meldingen</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" data-section="documents-news"><i class="fas fa-file-alt me-1"></i> Documenten & Nieuws</a>
+                            <a class="nav-link" href="#" data-section="chat-module"><i class="fas fa-comments me-2"></i> Chat</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link admin-only d-none" href="#" data-section="admin-panel"><i class="fas fa-tools me-1"></i> Admin Paneel</a>
+                            <a class="nav-link admin-only d-none" href="#" data-section="admin-panel"><i class="fas fa-user-shield me-2"></i> Admin Paneel</a>
                         </li>
                     </ul>
-                    <div class="d-flex">
-                        <span class="navbar-text me-3">Welkom, <span id="user-display-name">Gebruiker</span>!</span>
-                        <button class="btn btn-outline-light" id="logout-btn"><i class="fas fa-sign-out-alt me-1"></i> Uitloggen</button>
-                    </div>
+                    <span class="navbar-text me-3">
+                        Welkom, <span id="user-display-name">Gebruiker</span>!
+                    </span>
+                    <button class="btn btn-outline-light" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i> Uitloggen</button>
                 </div>
             </div>
         </nav>
 
-        <main class="container-fluid mt-4">
+        <div class="container mt-4">
             <section id="intranet-dashboard" class="content-section active">
                 <div class="p-4 bg-white rounded shadow-sm">
-                    <h2><i class="fas fa-home me-2"></i> Intranet Dashboard</h2>
+                    <h2><i class="fas fa-home me-2"></i> Dashboard</h2>
+                    <p>Overzicht van belangrijke GMS-informatie.</p>
                     <div class="row mt-4">
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
+                        <div class="col-md-4 mb-4">
+                            <div class="card text-white bg-primary mb-3 h-100 shadow-sm">
+                                <div class="card-header"><i class="fas fa-exclamation-triangle me-2"></i> Actieve Meldingen</div>
                                 <div class="card-body">
-                                    <h5 class="card-title"><i class="fas fa-newspaper me-2"></i> Nieuwsberichten</h5>
-                                    <ul class="list-group list-group-flush" id="news-list">
-                                        <li class="list-group-item"><strong>15 Jul 2025:</strong> Belangrijke update over veiligheidsprotocollen. <a href="#">Lees meer</a></li>
-                                        <li class="list-group-item"><strong>12 Jul 2025:</strong> Maandelijkse personeelsbijeenkomst op 20 juli. <a href="#">Lees meer</a></li>
-                                        <li class="list-group-item"><strong>10 Jul 2025:</strong> Nieuwe GMS-functionaliteiten gelanceerd! <a href="#">Lees meer</a></li>
+                                    <h1 class="card-title display-4" id="active-incidents-count">0</h1>
+                                    <p class="card-text">Nieuwe en in-uitvoering meldingen.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card text-white bg-danger mb-3 h-100 shadow-sm">
+                                <div class="card-header"><i class="fas fa-bell me-2"></i> Urgente Meldingen</div>
+                                <div class="card-body">
+                                    <h1 class="card-title display-4" id="urgent-incidents-count">0</h1>
+                                    <p class="card-text">Meldingen met hoge prioriteit.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card text-white bg-success mb-3 h-100 shadow-sm">
+                                <div class="card-header"><i class="fas fa-car-alt me-2"></i> Beschikbare Eenheden</div>
+                                <div class="card-body">
+                                    <h1 class="card-title display-4" id="available-units-count">0</h1>
+                                    <p class="card-text">Eenheden gereed voor inzet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-history me-2"></i> Laatste Updates</h5>
+                                    <ul class="list-group list-group-flush" id="latest-updates-list">
+                                        <li class="list-group-item text-muted">Geen recente updates.</li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
                                 <div class="card-body">
-                                    <h5 class="card-title"><i class="fas fa-calendar-alt me-2"></i> Aankomende Evenementen</h5>
-                                    <ul class="list-group list-group-flush" id="events-list">
-                                        <li class="list-group-item"><strong>20 Jul 2025:</strong> Personeelsbijeenkomst (10:00 - 12:00)</li>
-                                        <li class="list-group-item"><strong>25 Jul 2025:</strong> EHBO Training (13:00 - 17:00)</li>
+                                    <h5 class="card-title"><i class="fas fa-newspaper me-2"></i> Nieuws & Mededelingen</h5>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><strong>17/07/2025:</strong> Nieuwe GMS-functionaliteiten gelanceerd.</li>
+                                        <li class="list-group-item"><strong>15/07/2025:</strong> Oefening grootschalige evacuatie succesvol afgerond.</li>
+                                        <li class="list-group-item"><strong>10/07/2025:</strong> Herinnering: Software update vanavond om 22:00.</li>
                                     </ul>
                                 </div>
                             </div>
@@ -94,124 +205,41 @@
                 </div>
             </section>
 
-            <section id="gms-module" class="content-section d-none">
+            <section id="incident-list" class="content-section d-none">
                 <div class="p-4 bg-white rounded shadow-sm">
-                    <h2><i class="fas fa-headset me-2"></i> Geïntegreerd Meldkamer Systeem (GMS)</h2>
-                    <ul class="nav nav-tabs mb-4" id="gmsTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="gms-dashboard-tab" data-bs-toggle="tab" data-bs-target="#gms-dashboard-pane" type="button" role="tab" aria-controls="gms-dashboard-pane" aria-selected="true">Dashboard</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="gms-map-tab" data-bs-toggle="tab" data-bs-target="#gms-map-pane" type="button" role="tab" aria-controls="gms-map-pane" aria-selected="false">Kaart</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="gms-incidents-tab" data-bs-toggle="tab" data-bs-target="#gms-incidents-pane" type="button" role="tab" aria-controls="gms-incidents-pane" aria-selected="false">Meldingen</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="gms-communication-tab" data-bs-toggle="tab" data-bs-target="#gms-communication-pane" type="button" role="tab" aria-controls="gms-communication-pane" aria-selected="false">Communicatie</button>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="gmsTabContent">
-                        <div class="tab-pane fade show active" id="gms-dashboard-pane" role="tabpanel" aria-labelledby="gms-dashboard-tab">
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <div class="card text-white bg-danger h-100">
-                                        <div class="card-body">
-                                            <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> Actieve Meldingen</h5>
-                                            <p class="card-text fs-1 fw-bold" id="active-incidents-count">0</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="card text-white bg-warning h-100">
-                                        <div class="card-body">
-                                            <h5 class="card-title"><i class="fas fa-clock"></i> Urgent</div>
-                                            <p class="card-text fs-1 fw-bold" id="urgent-incidents-count">0</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="card text-white bg-success h-100">
-                                        <div class="card-body">
-                                            <h5 class="card-title"><i class="fas fa-truck"></i> Beschikbare Eenheden</h5>
-                                            <p class="card-text fs-1 fw-bold" id="available-units-count">0</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <h4 class="mt-4"><i class="fas fa-history me-2"></i> Laatste Updates</h4>
-                            <ul class="list-group" id="latest-updates-list">
-                                <li class="list-group-item">Geen recente updates.</li>
-                            </ul>
-                        </div>
-                        <div class="tab-pane fade" id="gms-map-pane" role="tabpanel" aria-labelledby="gms-map-tab">
-                            <div id="map-container" style="height: 500px; background-color: #e9ecef; border-radius: 8px;" class="d-flex align-items-center justify-content-center">
-                                <p class="text-muted">Kaart wordt hier geladen (bijv. Leaflet.js of Google Maps)...</p>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="gms-incidents-pane" role="tabpanel" aria-labelledby="gms-incidents-tab">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th scope="col">ID</th>
-                                            <th scope="col">Type</th>
-                                            <th scope="col">Locatie</th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col">Tijd</th>
-                                            <th scope="col">Actie</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="incidents-table-body">
-                                        <tr><td colspan="6" class="text-center text-muted">Geen meldingen om weer te geven.</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="gms-communication-pane" role="tabpanel" aria-labelledby="gms-communication-tab">
-                            <div class="chat-container card shadow-sm">
-                                <div class="card-body chat-messages" id="chat-messages">
-                                    <div class="message received card p-2 mb-2 bg-light">
-                                        <span class="sender fw-bold text-primary">Systeem:</span> Welkom in de communicatie ruimte.
-                                    </div>
-                                </div>
-                                <div class="card-footer d-flex bg-light">
-                                    <input type="text" class="form-control me-2" id="chat-input" placeholder="Typ uw bericht...">
-                                    <button class="btn btn-success" id="send-message-btn"><i class="fas fa-paper-plane me-1"></i> Verzenden</button>
-                                </div>
-                            </div>
-                        </div>
+                    <h2><i class="fas fa-fire-extinguisher me-2"></i> Actieve Meldingen</h2>
+                    <p>Overzicht van alle lopende en opgeloste incidenten.</p>
+                    <div class="table-responsive mt-4">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Locatie</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Tijd</th>
+                                    <th scope="col">Acties</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incidents-table-body">
+                                <tr><td colspan="6" class="text-center text-muted">Laden meldingen...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
-            <section id="documents-news" class="content-section d-none">
+            <section id="chat-module" class="content-section d-none">
                 <div class="p-4 bg-white rounded shadow-sm">
-                    <h2><i class="fas fa-file-alt me-2"></i> Documenten & Nieuws</h2>
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title"><i class="fas fa-folder-open me-2"></i> Belangrijke Documenten</h5>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item"><a href="#" class="text-decoration-none"><i class="fas fa-file-pdf me-2"></i> Bedrijfshandboek.pdf</a></li>
-                                        <li class="list-group-item"><a href="#" class="text-decoration-none"><i class="fas fa-file-word me-2"></i> HR Beleid 2025.docx</a></li>
-                                        <li class="list-group-item"><a href="#" class="text-decoration-none"><i class="fas fa-file-excel me-2"></i> Contactlijst.xlsx</a></li>
-                                    </ul>
-                                </div>
-                            </div>
+                    <h2><i class="fas fa-comments me-2"></i> Centrale Chat</h2>
+                    <p>Communiceer real-time met andere eenheden en centralisten.</p>
+                    <div class="chat-container">
+                        <div id="chat-messages" class="mb-3">
+                            <div class="message received card p-2 mb-2 bg-light"><span class="sender fw-bold text-primary">Systeem:</span> Welkom in de centrale chat.</div>
                         </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title"><i class="fas fa-bullhorn me-2"></i> Nieuwsarchief</h5>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item"><a href="#" class="text-decoration-none">Artikel: Uitbreiding faciliteiten (Juni 2025)</a></li>
-                                        <li class="list-group-item"><a href="#" class="text-decoration-none">Persbericht: Nieuwe directie (Mei 2025)</a></li>
-                                        <li class="list-group-item"><a href="#" class="text-decoration-none">Interne Mededeling: Jaarafsluiting (Dec 2024)</a></li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <div class="input-group">
+                            <input type="text" id="chat-input" class="form-control" placeholder="Typ uw bericht...">
+                            <button class="btn btn-primary" id="send-message-btn"><i class="fas fa-paper-plane me-1"></i> Verzenden</button>
                         </div>
                     </div>
                 </div>
@@ -221,37 +249,26 @@
                 <div class="p-4 bg-white rounded shadow-sm">
                     <h2><i class="fas fa-tools me-2"></i> Admin Paneel</h2>
                     <p>Welkom in het admin paneel. Hier kunt u gebruikers, content en GMS-instellingen beheren.</p>
-                    <div class="row mt-4">
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title"><i class="fas fa-users-cog me-2"></i> Gebruikersbeheer</h5>
-                                    <p class="card-text">Voeg gebruikers toe, bewerk rechten, reset wachtwoorden.</p>
-                                    <button class="btn btn-primary" id="manage-users-btn">Beheer Gebruikers</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title"><i class="fas fa-pencil-alt me-2"></i> Content Beheer</h5>
-                                    <p class="card-text">Beheer nieuwsberichten, documenten en evenementen.</p>
-                                    <button class="btn btn-primary" id="manage-content-btn">Beheer Content</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title"><i class="fas fa-cogs me-2"></i> GMS Instellingen</h5>
-                                    <p class="card-text">Configureer GMS-parameters en eenheden.</p>
-                                    <button class="btn btn-primary" id="manage-gms-btn">Beheer GMS</button>
-                                </div>
-                            </div>
+                    
+                    <div id="user-management-container" class="mt-4">
+                        <h4><i class="fas fa-users me-2"></i> Gebruikers Overzicht</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th scope="col">Gebruikersnaam</th>
+                                        <th scope="col">Rol</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Acties</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-table-body">
+                                    </tbody>
+                            </table>
                         </div>
                     </div>
-                    
-                    <div id="gms-settings-container" class="mt-5 d-none">
+
+                    <div id="gms-settings-container" class="mt-5">
                         <h4><i class="fas fa-cogs me-2"></i> GMS Simulatie Instellingen</h4>
                         <form id="gms-settings-form">
                             <div class="mb-3">
@@ -264,17 +281,88 @@
                                 <input type="number" class="form-control" id="incident-spawn-chance" step="0.01" min="0" max="1" value="0.3">
                                 <div class="form-text">Hogere waarde = meer meldingen. Standaard is 0.3 (30%).</div>
                             </div>
-                            <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Instellingen Opslaan</button>
+                            <div class="mb-3">
+                                <label for="min-response-time" class="form-label">Minimale responstijd (seconden):</label>
+                                <input type="number" class="form-control" id="min-response-time" min="5" value="60">
+                                <div class="form-text">Minimale tijd totdat een 'nieuwe' melding 'in uitvoering' kan worden.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="max-response-time" class="form-label">Maximale responstijd (seconden):</label>
+                                <input type="number" class="form-control" id="max-response-time" min="10" value="180">
+                                <div class="form-text">Maximale tijd totdat een 'nieuwe' melding 'in uitvoering' kan worden.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="update-frequency" class="form-label">Frequentie van statusupdates (seconden):</label>
+                                <input type="number" class="form-control" id="update-frequency" min="1" value="5">
+                                <div class="form-text">Hoe vaak de GMS-simulatie de status van meldingen controleert en bijwerkt.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="resolution-chance" class="form-label">Kans dat 'in uitvoering' melding 'opgelost' wordt (0.0 - 1.0):</label>
+                                <input type="number" class="form-control" id="resolution-chance" step="0.01" min="0" max="1" value="0.05">
+                                <div class="form-text">Hogere waarde = meldingen worden sneller opgelost. Standaard is 0.05 (5%).</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="resolved-retention-time" class="form-label">Tijd dat 'opgeloste' meldingen zichtbaar blijven (seconden):</label>
+                                <input type="number" class="form-control" id="resolved-retention-time" min="60" value="300">
+                                <div class="form-text">Na deze tijd wordt een 'opgeloste' melding uit de lijst verwijderd. Standaard is 300 seconden (5 minuten).</div>
+                            </div>
+
+                            <h5 class="mt-4"><i class="fas fa-exclamation-circle me-2"></i> Incident Types & Urgentie</h5>
+                            <div id="incident-types-list" class="mb-3">
+                                </div>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="new-incident-type-name" placeholder="Nieuw incident type naam">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="checkbox" id="new-incident-type-urgent" aria-label="Incident type is standaard urgent">
+                                    <label class="form-check-label ms-2" for="new-incident-type-urgent">Standaard Urgent</label>
+                                </div>
+                                <button class="btn btn-outline-secondary" type="button" id="add-incident-type-btn"><i class="fas fa-plus me-1"></i> Toevoegen</button>
+                            </div>
+
+                            <h5 class="mt-4"><i class="fas fa-palette me-2"></i> Uiterlijk Instellingen</h5>
+                            <div class="mb-3">
+                                <label for="primary-color" class="form-label">Hoofdkleur (bijv. #007bff of red):</label>
+                                <input type="text" class="form-control" id="primary-color" value="#0d6efd">
+                                <div class="form-text">De hoofdkleur van de interface (bijv. navigatiebalk, knoppen). Gebruik HEX-code of kleurnaam.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="secondary-color" class="form-label">Accentkleur (bijv. #6c757d of green):</label>
+                                <input type="text" class="form-control" id="secondary-color" value="#6c757d">
+                                <div class="form-text">Een secundaire kleur voor elementen of tekst. Gebruik HEX-code of kleurnaam.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="text-color" class="form-label">Tekstkleur (bijv. #212529 of black):</label>
+                                <input type="text" class="form-control" id="text-color" value="#212529">
+                                <div class="form-text">Algemene tekstkleur. Zorg voor voldoende contrast.</div>
+                            </div>
+                             <div class="mb-3">
+                                <label for="background-image-url" class="form-label">Achtergrondafbeelding URL:</label>
+                                <input type="url" class="form-control" id="background-image-url" value="">
+                                <div class="form-text">URL van een afbeelding voor de achtergrond van de intranet sectie. Leeg laten voor geen afbeelding.</div>
+                            </div>
+                             <div class="mb-3">
+                                <label for="font-size-base" class="form-label">Basis Lettergrootte (px):</label>
+                                <input type="number" class="form-control" id="font-size-base" min="10" max="24" value="16">
+                                <div class="form-text">Stel de basis lettergrootte in voor de meeste tekst.</div>
+                            </div>
+
+
+                            <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save me-1"></i> Instellingen Opslaan</button>
                             <div id="gms-settings-success" class="text-success mt-2 d-none">Instellingen succesvol opgeslagen!</div>
                         </form>
                     </div>
 
+                    <div id="content-management-container" class="mt-5 d-none">
+                        <h4><i class="fas fa-pencil-alt me-2"></i> Content Beheer</h4>
+                        <p>Hier komt de functionaliteit voor het beheren van nieuwsberichten, documenten en evenementen.</p>
+                        </div>
+
                 </div>
             </section>
-        </main>
-    </div>
+        </div>
+    </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eGYC7PTY/LSXL0J" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhyMqrNxjC+pE9dY/H3c3s9rD/" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
-</html> 
+</html>
