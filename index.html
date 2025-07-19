@@ -6,91 +6,7 @@
     <title>GMS Intranet</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjPz2wfQvO3sS/HgejokE/k9CgA/Yj5i5uWz/I4y2f5U1u/B2y3a2s/" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-        /* Aangepaste CSS voor status badges */
-        .status-badge {
-            display: inline-block;
-            padding: .35em .65em;
-            font-size: .75em;
-            font-weight: 700;
-            line-height: 1;
-            color: #fff;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: .375rem;
-        }
-        .status-badge.new { background-color: #0d6efd; } /* Primary blue */
-        .status-badge.in-progress { background-color: #ffc107; color: #000; } /* Warning yellow */
-        .status-badge.resolved { background-color: #198754; } /* Success green */
-        .status-badge.closed { background-color: #6c757d; } /* Secondary grey */
-
-        /* Aangepaste CSS voor chat berichten */
-        #chat-messages {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #dee2e6;
-            border-radius: .375rem;
-            padding: 10px;
-            background-color: #f8f9fa;
-        }
-        .message.sent {
-            text-align: right;
-            margin-left: auto;
-            background-color: #d1e7dd; /* Light green for sent */
-            border-color: #badbcc;
-        }
-        .message.received {
-            text-align: left;
-            margin-right: auto;
-            background-color: #e2e3e5; /* Light grey for received */
-            border-color: #d3d6d8;
-        }
-        .message .sender {
-            font-weight: bold;
-        }
-
-        /* Styling voor actieve navigatielink */
-        .nav-link.active {
-            font-weight: bold;
-            color: var(--bs-primary) !important; /* Gebruik Bootstrap primary variable */
-        }
-
-        /* Standaard styling voor body, kan overschreven worden door JS via CSS variabelen */
-        :root {
-            --bs-primary: #0d6efd; /* Standaard Bootstrap primary */
-            --bs-secondary: #6c757d; /* Standaard Bootstrap secondary */
-            --bs-body-color: #212529; /* Standaard Bootstrap tekstkleur */
-            font-size: 16px; /* Standaard basis lettergrootte */
-        }
-        
-        body {
-            color: var(--bs-body-color); /* Toepassen op body */
-            font-size: var(--font-size); /* Nieuw: voor basis lettergrootte */
-        }
-        
-        .navbar {
-            background-color: var(--bs-primary) !important; /* Navigatiebalk hoofdkleur */
-            color: white !important;
-        }
-
-        .navbar .navbar-brand,
-        .navbar .nav-link {
-            color: white !important;
-        }
-        .navbar .nav-link:hover {
-            color: rgba(255, 255, 255, 0.75) !important;
-        }
-
-        /* Achtergrondafbeelding voor intranet sectie */
-        #intranet-section {
-            background-image: none; /* Standaard geen afbeelding, wordt door JS ingesteld */
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            min-height: calc(100vh - 56px); /* Zorg dat het minstens de schermhoogte is min navbar */
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -345,6 +261,11 @@
                                 <input type="number" class="form-control" id="font-size-base" min="10" max="24" value="16">
                                 <div class="form-text">Stel de basis lettergrootte in voor de meeste tekst.</div>
                             </div>
+                            <div class="mb-3">
+                                <label for="navbar-text-color-input" class="form-label">Navigatiebalk tekstkleur (bijv. #ffffff of black):</label>
+                                <input type="text" class="form-control" id="navbar-text-color-input" value="#ffffff">
+                                <div class="form-text">De tekstkleur voor items in de navigatiebalk. Kies wit voor donkere primaire kleuren, zwart voor lichte.</div>
+                            </div>
 
 
                             <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save me-1"></i> Instellingen Opslaan</button>
@@ -365,4 +286,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhyMqrNxjC+pE9dY/H3c3s9rD/" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
-</html>
+</html> 

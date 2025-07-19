@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         secondaryColor: '#6c757d', // Bootstrap secondary
         textColor: '#212529', // Bootstrap body color
         backgroundImageUrl: '', // Geen standaard achtergrondafbeelding
-        fontSizeBase: 16 // Standaard 16px
+        fontSizeBase: 16, // Standaard 16px
+        navbarTextColor: '#ffffff' // Standaard witte tekst voor navbar
     };
 
     // Laad GMS instellingen uit localStorage of gebruik standaardwaarden
@@ -71,10 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Functie om uiterlijk instellingen toe te passen
     const applyGmsVisualSettings = () => {
         const root = document.documentElement; // De <html> tag
+
+        // Stel algemene kleuren en afmetingen in via CSS variabelen
         root.style.setProperty('--bs-primary', gmsSettings.primaryColor);
         root.style.setProperty('--bs-secondary', gmsSettings.secondaryColor);
-        root.style.setProperty('--bs-body-color', gmsSettings.textColor);
-        root.style.setProperty('font-size', `${gmsSettings.fontSizeBase}px`);
+        root.style.setProperty('--text-color', gmsSettings.textColor); // Gebruik --text-color voor algemene tekst
+        root.style.setProperty('--body-bg-color', gmsSettings.textColor); // Optioneel: als body bg kleur afhangt van text
+        root.style.setProperty('--font-size-base', `${gmsSettings.fontSizeBase / 16}rem`); // Zet pixels om naar rem
+
+        // Stel navbar specifieke kleuren in
+        root.style.setProperty('--navbar-bg-color', gmsSettings.primaryColor);
+        root.style.setProperty('--navbar-text-color', gmsSettings.navbarTextColor);
 
         // Achtergrondafbeelding voor de intranet sectie
         const intranetSection = document.getElementById('intranet-section');
@@ -83,22 +91,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 intranetSection.style.backgroundImage = `url('${gmsSettings.backgroundImageUrl}')`;
                 intranetSection.style.backgroundSize = 'cover';
                 intranetSection.style.backgroundPosition = 'center';
-                intranetSection.style.backgroundAttachment = 'fixed'; // Optioneel: scrollt niet mee
+                intranetSection.style.backgroundAttachment = 'fixed';
             } else {
                 intranetSection.style.backgroundImage = 'none';
             }
         }
 
-        // Optioneel: Update navigatiebalk kleur als deze dynamisch moet zijn
+        // Specifieke aanpassing voor de navbar-toggler-icon kleur
         const navbar = document.querySelector('.navbar');
         if (navbar) {
-             navbar.style.backgroundColor = gmsSettings.primaryColor; // Voor een simpele aanpassing
-             navbar.classList.remove('navbar-dark', 'bg-primary'); // Verwijder Bootstrap standaardklassen indien nodig
-             navbar.style.setProperty('color', gmsSettings.textColor); // Tekstkleur voor navbar
+             const togglerIcon = navbar.querySelector('.navbar-toggler-icon');
+             if (togglerIcon) {
+                // Functie om een HEX-kleur om te zetten naar RGB voor de SVG
+                const hexToRgb = (hex) => {
+                    const bigint = parseInt(hex.replace('#', ''), 16);
+                    const r = (bigint >> 16) & 255;
+                    const g = (bigint >> 8) & 255;
+                    const b = bigint & 255;
+                    return `${r}, ${g}, ${b}`;
+                };
+
+                // Gebruik de navbarTextColor om de kleur van het SVG-pad in te stellen
+                const rgbColor = hexToRgb(gmsSettings.navbarTextColor);
+                const svgData = `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb(${rgbColor})' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e")`;
+                togglerIcon.style.backgroundImage = svgData;
+             }
         }
-        // Voor de knoppen en andere elementen die Bootstrap variabelen gebruiken,
-        // zou je CSS variabelen moeten overschrijven of specifieke klassen maken.
-        // Voor deze demo volstaat het aanpassen van de root-variabelen vaak.
     };
 
 
@@ -334,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const sortedIncidents = [...incidents].sort((a, b) => {
                 const statusOrder = { 'new': 1, 'in-progress': 2, 'resolved': 3 };
                 if (statusOrder[a.status] !== statusOrder[b.status]) {
-                    return statusOrder[a.status] - statusOrder[b.status];
+                    return statusOrder[a.status] - b.status; // Corrected to use statusOrder for comparison
                 }
                 return b.spawnTime - a.spawnTime;
             });
@@ -403,8 +421,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Admin Paneel Functionaliteit ---
         // We verwijderen de knoppen om te wisselen tussen de admin modules,
         // en zorgen ervoor dat ze direct geladen en zichtbaar zijn.
-        // const manageUsersBtn = document.getElementById('manage-users-btn'); // Niet meer nodig
-        // const manageGmsBtn = document.getElementById('manage-gms-btn');     // Niet meer nodig
         
         // Containers voor de verschillende admin modules
         const userManagementContainer = document.getElementById('user-management-container');
@@ -433,10 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const textColorInput = document.getElementById('text-color');
         const backgroundImageUrlInput = document.getElementById('background-image-url');
         const fontSizeBaseInput = document.getElementById('font-size-base');
-
-        // Deze knoppen zijn nu overbodig omdat de secties direct zichtbaar zijn
-        // manageUsersBtn.addEventListener('click', () => { ... });
-        // manageGmsBtn.addEventListener('click', () => { ... });
+        const navbarTextColorInput = document.getElementById('navbar-text-color-input');
 
 
         const renderUserManagement = () => {
@@ -545,6 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
             textColorInput.value = gmsSettings.textColor;
             backgroundImageUrlInput.value = gmsSettings.backgroundImageUrl;
             fontSizeBaseInput.value = gmsSettings.fontSizeBase;
+            navbarTextColorInput.value = gmsSettings.navbarTextColor;
 
             gmsSettingsSuccessMessage.classList.add('d-none'); // Verberg succesbericht
         };
@@ -629,6 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gmsSettings.textColor = textColorInput.value;
             gmsSettings.backgroundImageUrl = backgroundImageUrlInput.value;
             gmsSettings.fontSizeBase = parseInt(fontSizeBaseInput.value, 10);
+            gmsSettings.navbarTextColor = navbarTextColorInput.value;
 
             // Basic validation for simulation settings (already covered in previous steps)
             if (isNaN(gmsSettings.maxAvailableUnits) || gmsSettings.maxAvailableUnits < 1) {
@@ -686,9 +701,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // De "Content Beheer" knop blijft bestaan, maar de functionaliteit is nog niet ingebouwd
-        document.getElementById('manage-content-btn').addEventListener('click', () => {
-            alert('Navigeren naar Content Beheer - Functionaliteit nog niet geïmplementeerd.');
-        });
+        // document.getElementById('manage-content-btn').addEventListener('click', () => { // deze knop is verwijderd in de HTML
+        //     alert('Navigeren naar Content Beheer - Functionaliteit nog niet geïmplementeerd.');
+        // });
 
 
     } else if (document.getElementById('register-section')) {

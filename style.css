@@ -1,125 +1,249 @@
-/* Custom CSS voor intranet en GMS */
+/*
+ * Globale CSS Variabelen
+ * Deze variabelen kunnen dynamisch worden aangepast via JavaScript
+ * voor theming en aanpassing van het uiterlijk.
+ * Standaardwaarden komen overeen met Bootstrap 5.
+ */
+:root {
+    /* Bootstrap Algemene Kleuren */
+    --bs-primary: #0d6efd; /* Standaard Bootstrap primary blauw */
+    --bs-secondary: #6c757d; /* Standaard Bootstrap secondary grijs */
+    --bs-success: #198754; /* Standaard Bootstrap success groen */
+    --bs-warning: #ffc107; /* Standaard Bootstrap warning geel */
+    --bs-danger: #dc3545; /* Standaard Bootstrap danger rood */
+    --bs-info: #0dcaf0; /* Standaard Bootstrap info lichtblauw */
+    --bs-light: #f8f9fa; /* Standaard Bootstrap light */
+    --bs-dark: #212529; /* Standaard Bootstrap dark (voor algemene tekstkleur) */
 
+    /* Theming Kleuren (aanpasbaar via Admin Panel) */
+    --navbar-bg-color: var(--bs-primary); /* Achtergrondkleur navigatiebalk */
+    --navbar-text-color: #ffffff; /* Tekstkleur navigatiebalk items */
+    --navbar-hover-color: rgba(255, 255, 255, 0.75); /* Hover kleur navigatiebalk items */
+    --navbar-active-color: var(--bs-info); /* Kleur actieve navigatielink */
+
+    --body-bg-color: var(--bs-light); /* Achtergrondkleur van de body */
+    --card-bg-color: #ffffff; /* Achtergrondkleur van de kaarten */
+    --border-color: #dee2e6; /* Standaard randkleur */
+    --text-color: var(--bs-dark); /* Algemene tekstkleur */
+    --link-color: var(--bs-primary); /* Standaard linkkleur */
+    --link-hover-color: #0a58ca; /* Hover kleur voor links */
+    --font-size-base: 1rem; /* Basis lettergrootte (16px) */
+
+    /* Specifieke kleuren voor status badges */
+    --badge-new-color: var(--bs-primary);
+    --badge-in-progress-color: var(--bs-warning);
+    --badge-in-progress-text-color: var(--bs-dark); /* Zwarte tekst op gele badge */
+    --badge-resolved-color: var(--bs-success);
+    --badge-closed-color: var(--bs-secondary);
+
+    /* Chat kleuren */
+    --chat-bg-color: #f8f9fa; /* Achtergrond van het chatvenster */
+    --message-received-bg-color: #e2e3e5; /* Achtergrond ontvangen bericht */
+    --message-sent-bg-color: #d1e7dd; /* Achtergrond verzonden bericht */
+    --message-received-border-color: #d3d6d8;
+    --message-sent-border-color: #badbcc;
+}
+
+/* Basis styling voor de hele pagina */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f2f5; /* Lichtere achtergrond voor intranet gevoel */
-    color: #333;
+    font-family: Arial, sans-serif;
+    font-size: var(--font-size-base);
+    color: var(--text-color);
+    background-color: var(--body-bg-color);
 }
 
-/* Aanpassingen voor Bootstrap Navbar */
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.5em;
+a {
+    color: var(--link-color);
+    text-decoration: none;
 }
 
-.navbar-nav .nav-link {
-    font-size: 1.05em;
-    padding: 0.75rem 1rem;
-    transition: background-color 0.3s ease;
-    border-radius: 5px;
+a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
 }
 
-.navbar-nav .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
+/* --- Algemene UI Componenten --- */
 
-.navbar-nav .nav-link.active {
-    background-color: #0d6efd; /* Bootstrap primary color */
-    color: white !important;
-}
-
-.navbar-text {
-    color: rgba(255, 255, 255, 0.75);
-}
-
-/* Algemene sectie styling */
-.content-section {
-    min-height: calc(100vh - 100px); /* Iets korter dan viewport voor header */
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.content-section h2 {
-    color: #2c3e50;
-    margin-bottom: 25px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e9ecef;
-}
-
-.content-section h2 i {
-    color: #0d6efd; /* Bootstrap primary */
-}
-
-/* Card Styling */
+/* Kaart styling (Bootstrap overschrijven) */
 .card {
-    border: none;
-    border-radius: 8px;
-    overflow: hidden;
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); /* Subtiele schaduw */
 }
 
-/* GMS Specifieke styling (gerecycled en aangepast voor Bootstrap) */
-.gms-module .card-title i {
-    color: rgba(255, 255, 255, 0.8);
+.card-header {
+    background-color: var(--bs-primary); /* Primair voor headers van kaarten */
+    color: #fff;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.gms-module .tab-pane {
-    padding-top: 20px;
+/* Knoppen (Bootstrap overschrijven) */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+.btn-primary:hover {
+    background-color: var(--link-hover-color); /* Iets donkerder blauw */
+    border-color: var(--link-hover-color);
 }
 
-/* Status Badges in GMS incidenten tabel */
-.status-badge {
-    padding: .35em .65em;
-    border-radius: .25rem;
-    font-size: .75em;
+.btn-outline-light {
+    color: var(--navbar-text-color);
+    border-color: var(--navbar-text-color);
+}
+.btn-outline-light:hover {
+    background-color: var(--navbar-text-color);
+    color: var(--navbar-bg-color) !important; /* Tekst wordt de achtergrondkleur van de navbar */
+}
+
+/* Formulieren */
+.form-control {
+    border-color: var(--border-color);
+}
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb),.25);
+}
+
+/* Tabellen */
+.table {
+    --bs-table-bg: var(--card-bg-color); /* Gebruik kaart achtergrond voor tabel */
+    --bs-table-striped-bg: #f2f2f2; /* Lichtere streep */
+    --bs-table-hover-bg: #e9ecef; /* Hover kleur */
+}
+.table-dark {
+    --bs-table-bg: var(--bs-dark);
+    --bs-table-color: #fff;
+}
+.table-danger {
+    --bs-table-bg: var(--bs-danger);
+    --bs-table-color: #fff;
+}
+
+/* --- Specifieke Sectie Styling --- */
+
+/* Login Sectie */
+#login-section {
+    background-color: var(--body-bg-color); /* Match body background */
+}
+
+/* Intranet Sectie */
+#intranet-section {
+    background-image: none; /* Standaard geen afbeelding, wordt door JS ingesteld */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: calc(100vh - 56px); /* Zorg dat het minstens de schermhoogte is min navbar */
+}
+
+/* Navigatiebalk */
+.navbar {
+    background-color: var(--navbar-bg-color) !important; /* Hoofdkleur via variabele */
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar-text {
+    color: var(--navbar-text-color) !important; /* Tekstkleur via variabele */
+}
+
+.navbar .nav-link:hover,
+.navbar .navbar-brand:hover,
+.navbar-text:hover {
+    color: var(--navbar-hover-color) !important; /* Hover kleur via variabele */
+}
+
+/* Actieve navigatielink */
+.nav-link.active {
     font-weight: bold;
+    color: var(--navbar-active-color) !important; /* Actieve link kleur via variabele */
+}
+
+/* Navbar Toggler (voor mobiele weergave) */
+.navbar-toggler {
+    border-color: var(--navbar-text-color) !important; /* Randkleur gelijk aan tekstkleur */
+}
+.navbar-toggler-icon {
+    /* De background-image wordt dynamisch gezet door JavaScript om de kleur van het icoon aan te passen */
+    /* Zonder JS zou dit een vaste kleur zijn, bijv.: */
+    /* background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb(255, 255, 255)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important; */
+}
+
+
+/* Status Badges */
+.status-badge {
     display: inline-block;
+    padding: .35em .65em;
+    font-size: .75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff; /* Standaard witte tekst voor de meeste badges */
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .375rem;
 }
-
-.status-badge.new { background-color: #dc3545; color: white; } /* Bootstrap danger */
-.status-badge.in-progress { background-color: #ffc107; color: #212529; } /* Bootstrap warning */
-.status-badge.resolved { background-color: #198754; color: white; } /* Bootstrap success */
-.status-badge.closed { background-color: #6c757d; color: white; } /* Bootstrap secondary */
-
-/* Chat specifieke styling */
-.chat-container {
-    height: 450px;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #dee2e6;
+.status-badge.new { background-color: var(--badge-new-color); }
+.status-badge.in-progress {
+    background-color: var(--badge-in-progress-color);
+    color: var(--badge-in-progress-text-color); /* Zwarte tekst op gele badge voor betere leesbaarheid */
 }
+.status-badge.resolved { background-color: var(--badge-resolved-color); }
+.status-badge.closed { background-color: var(--badge-closed-color); }
 
-.chat-messages {
-    flex-grow: 1;
+
+/* Chat Module */
+#chat-messages {
+    max-height: 400px;
     overflow-y: auto;
-    background-color: #e9ecef;
-    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: .375rem;
+    padding: 10px;
+    background-color: var(--chat-bg-color);
 }
-
-.message.received {
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    float: left;
-    max-width: 75%;
-    clear: both;
-    margin-bottom: 10px;
-}
-
 .message.sent {
-    background-color: #d1e7dd; /* Light green from Bootstrap alert-success */
-    border: 1px solid #a3cfbb;
-    float: right;
-    max-width: 75%;
-    clear: both;
-    margin-bottom: 10px;
+    text-align: right;
+    margin-left: auto; /* Zorgt dat het bericht naar rechts uitlijnt */
+    background-color: var(--message-sent-bg-color);
+    border-color: var(--message-sent-border-color);
+    color: var(--bs-dark); /* Tekstkleur voor verzonden berichten */
+    padding: .5rem .75rem;
+    border-radius: .5rem;
+    max-width: 75%; /* Beperk de breedte */
 }
-
+.message.received {
+    text-align: left;
+    margin-right: auto; /* Zorgt dat het bericht naar links uitlijnt */
+    background-color: var(--message-received-bg-color);
+    border-color: var(--message-received-border-color);
+    color: var(--bs-dark); /* Tekstkleur voor ontvangen berichten */
+    padding: .5rem .75rem;
+    border-radius: .5rem;
+    max-width: 75%; /* Beperk de breedte */
+}
 .message .sender {
-    color: #0d6efd; /* Primary color */
+    font-weight: bold;
+    color: var(--bs-primary); /* Primaire kleur voor afzender naam */
+    display: block; /* Zorgt dat de naam op een aparte regel staat */
+    margin-bottom: .25rem;
+}
+.message.sent .sender {
+    color: var(--bs-dark); /* Donkere kleur voor afzender naam bij eigen berichten */
 }
 
-/* Admin Panel Buttons */
-#admin-panel .btn {
-    margin-top: 15px;
+/* Lijstgroepen (Updates, Nieuws) */
+.list-group-item {
+    background-color: var(--card-bg-color);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* Verberg secties die niet actief zijn */
+.content-section.d-none {
+    display: none !important;
+}
+
+/* Algemene schaduwen voor kaarten en vergelijkbare elementen */
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
 }
