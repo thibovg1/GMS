@@ -3,97 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GMS - Geïntegreerd Meldkamer Systeem</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Bedrijfsintranet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="navbar">
-        <div class="logo">GMS</div>
-        <nav>
-            <ul>
-                <li><a href="#" data-section="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="#" data-section="map"><i class="fas fa-map-marked-alt"></i> Kaart</a></li>
-                <li><a href="#" data-section="incidents"><i class="fas fa-exclamation-triangle"></i> Meldingen</a></li>
-                <li><a href="#" data-section="communication"><i class="fas fa-comments"></i> Communicatie</a></li>
-                <li><a href="#" data-section="settings"><i class="fas fa-cog"></i> Instellingen</a></li>
-            </ul>
-        </nav>
-        <div class="user-info">
-            Welkom, Centralist! <i class="fas fa-user-circle"></i>
+
+    <div id="login-section" class="d-flex align-items-center justify-content-center vh-100 bg-light">
+        <div class="card p-4 shadow-lg" style="width: 400px;">
+            <h2 class="card-title text-center mb-4">Inloggen op Intranet</h2>
+            <form id="login-form">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Gebruikersnaam</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Wachtwoord</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <div id="login-error" class="text-danger text-center mt-3 d-none">Ongeldige gebruikersnaam of wachtwoord.</div>
+            </form>
         </div>
-    </header>
+    </div>
 
-    <main class="container">
-        <section id="dashboard" class="content-section active">
-            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
-            <div class="dashboard-grid">
-                <div class="card active-incidents">
-                    <h3>Actieve Meldingen</h3>
-                    <p id="active-incidents-count">0</p>
-                </div>
-                <div class="card urgent-incidents">
-                    <h3>Urgent</h3>
-                    <p id="urgent-incidents-count">0</p>
-                </div>
-                <div class="card pending-units">
-                    <h3>Beschikbare Eenheden</h3>
-                    <p id="available-units-count">0</p>
-                </div>
-                <div class="card latest-updates">
-                    <h3>Laatste Updates</h3>
-                    <ul id="latest-updates-list">
-                        <li>Geen recente updates.</li>
+    <div id="intranet-section" class="d-none">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Bedrijfsintranet</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#" data-section="intranet-dashboard"><i class="fas fa-home me-1"></i> Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="gms-module"><i class="fas fa-headset me-1"></i> Meldkamer Systeem</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="documents-news"><i class="fas fa-file-alt me-1"></i> Documenten & Nieuws</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link admin-only d-none" href="#" data-section="admin-panel"><i class="fas fa-tools me-1"></i> Admin Paneel</a>
+                        </li>
                     </ul>
-                </div>
-            </div>
-        </section>
-
-        <section id="map" class="content-section">
-            <h2><i class="fas fa-map-marked-alt"></i> Kaartweergave</h2>
-            <div id="map-container" style="height: 500px; background-color: #e0e0e0; border-radius: 8px;">
-                <p style="text-align: center; padding-top: 200px;">Kaart wordt hier geladen...</p>
-            </div>
-        </section>
-
-        <section id="incidents" class="content-section">
-            <h2><i class="fas fa-exclamation-triangle"></i> Meldingen</h2>
-            <div class="incident-list">
-                <div class="incident-header">
-                    <span>ID</span>
-                    <span>Type</span>
-                    <span>Locatie</span>
-                    <span>Status</span>
-                    <span>Tijd</span>
-                    <span>Actie</span>
-                </div>
-                <div id="incidents-container">
-                    <p style="text-align: center;">Geen meldingen om weer te geven.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="communication" class="content-section">
-            <h2><i class="fas fa-comments"></i> Communicatie</h2>
-            <div class="chat-container">
-                <div class="chat-messages" id="chat-messages">
-                    <div class="message received">
-                        <span class="sender">Systeem:</span> Welkom in de communicatie ruimte.
+                    <div class="d-flex">
+                        <span class="navbar-text me-3">Welkom, <span id="user-display-name">Gebruiker</span>!</span>
+                        <button class="btn btn-outline-light" id="logout-btn"><i class="fas fa-sign-out-alt me-1"></i> Uitloggen</button>
                     </div>
                 </div>
-                <div class="chat-input">
-                    <input type="text" id="chat-input" placeholder="Typ uw bericht...">
-                    <button id="send-message-btn"><i class="fas fa-paper-plane"></i> Verzenden</button>
-                </div>
             </div>
-        </section>
+        </nav>
 
-        <section id="settings" class="content-section">
-            <h2><i class="fas fa-cog"></i> Instellingen</h2>
-            <p>Hier komen de systeeminstellingen.</p>
-        </section>
-    </main>
+        <main class="container-fluid mt-4">
+            <section id="intranet-dashboard" class="content-section active">
+                <div class="p-4 bg-white rounded shadow-sm">
+                    <h2><i class="fas fa-home me-2"></i> Intranet Dashboard</h2>
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-newspaper me-2"></i> Nieuwsberichten</h5>
+                                    <ul class="list-group list-group-flush" id="news-list">
+                                        <li class="list-group-item"><strong>15 Jul 2025:</strong> Belangrijke update over veiligheidsprotocollen. <a href="#">Lees meer</a></li>
+                                        <li class="list-group-item"><strong>12 Jul 2025:</strong> Maandelijkse personeelsbijeenkomst op 20 juli. <a href="#">Lees meer</a></li>
+                                        <li class="list-group-item"><strong>10 Jul 2025:</strong> Nieuwe GMS-functionaliteiten gelanceerd! <a href="#">Lees meer</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-calendar-alt me-2"></i> Aankomende Evenementen</h5>
+                                    <ul class="list-group list-group-flush" id="events-list">
+                                        <li class="list-group-item"><strong>20 Jul 2025:</strong> Personeelsbijeenkomst (10:00 - 12:00)</li>
+                                        <li class="list-group-item"><strong>25 Jul 2025:</strong> EHBO Training (13:00 - 17:00)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
+            <section id="gms-module" class="content-section d-none">
+                <div class="p-4 bg-white rounded shadow-sm">
+                    <h2><i class="fas fa-headset me-2"></i> Geïntegreerd Meldkamer Systeem (GMS)</h2>
+                    <ul class="nav nav-tabs mb-4" id="gmsTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="gms-dashboard-tab" data-bs-toggle="tab" data-bs-target="#gms-dashboard-pane" type="button" role="tab" aria-controls="gms-dashboard-pane" aria-selected="true">Dashboard</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="gms-map-tab" data-bs-toggle="tab" data-bs-target="#gms-map-pane" type="button" role="tab" aria-controls="gms-map-pane" aria-selected="false">Kaart</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="gms-incidents-tab" data-bs-toggle="tab" data-bs-target="#gms-incidents-pane" type="button" role="tab" aria-controls="gms-incidents-pane" aria-selected="false">Meldingen</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="gms-communication-tab" data-bs-toggle="tab" data-bs-target="#gms-communication-pane" type="button" role="tab" aria-controls="gms-communication-pane" aria-selected="false">Communicatie</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="gmsTabContent">
+                        <div class="tab-pane fade show active" id="gms-dashboard-pane" role="tabpanel" aria-labelledby="gms-dashboard-tab">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="card text-white bg-danger h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> Actieve Meldingen</h5>
+                                            <p class="card-text fs-1 fw-bold" id="active-incidents-count">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card text-white bg-warning h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><i class="fas fa-clock"></i> Urgent</h5>
+                                            <p class="card-text fs-1 fw-bold" id="urgent-incidents-count">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card text-white bg-success h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><i class="fas fa-truck"></i> Beschikbare Eenheden</h5>
+                                            <p class="card-text fs-1 fw-bold" id="available-units-count">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h4 class="mt-4"><i class="fas fa-history me-2"></i> Laatste Updates</h4>
+                            <ul class="list-group" id="latest-updates-list">
+                                <li class="list-group-item">Geen recente updates.</li>
+                            </ul>
+                        </div>
+                        <div class="tab-pane fade" id="gms-map-pane" role="tabpanel" aria-labelledby="gms-map-tab">
+                            <div id="map-container" style="height: 500px; background-color: #e9ecef; border-radius: 8px;" class="d-flex align-items-center justify-content-center">
+                                <p class="text-muted">Kaart wordt hier geladen (bijv. Leaflet.js of Google Maps)...</p>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="gms-incidents-pane" role="tabpanel" aria-labelledby="gms-incidents-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Type</th>
+                                            <th scope="col">Locatie</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Tijd</th>
+                                            <th scope="col">Actie</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="incidents-table-body">
+                                        <tr><td colspan="6" class="text-center text-muted">Geen meldingen om weer te geven.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="gms-communication-pane" role="tabpanel" aria-labelledby="gms-communication-tab">
+                            <div class="chat-container card shadow-sm">
+                                <div class="card-body chat-messages" id="chat-messages">
+                                    <div class="message received card p-2 mb-2 bg-light">
+                                        <span class="sender fw-bold text-primary">Systeem:</span> Welkom in de communicatie ruimte.
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex bg-light">
+                                    <input type="text" class="form-control me-2" id="chat-input" placeholder="Typ uw bericht...">
+                                    <button class="btn btn-success" id="send-message-btn"><i class="fas fa-paper-plane me-1"></i> Verzenden</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="documents-news" class="content-section d-none">
+                <div class="p-4 bg-white rounded shadow-sm">
+                    <h2><i class="fas fa-file-alt me-2"></i> Documenten & Nieuws</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-folder-open me-2"></i> Belangrijke Documenten</h5>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><a href="#" class="text-decoration-none"><i class="fas fa-file-pdf me-2"></i> Bedrijfshandboek.pdf</a></li>
+                                        <li class="list-group-item"><a href="#" class="text-decoration-none"><i class="fas fa-file-word me-2"></i> HR Beleid 2025.docx</a></li>
+                                        <li class="list-group-item"><a href="#" class="text-decoration-none"><i class="fas fa-file-excel me-2"></i> Contactlijst.xlsx</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-bullhorn me-2"></i> Nieuwsarchief</h5>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><a href="#" class="text-decoration-none">Artikel: Uitbreiding faciliteiten (Juni 2025)</a></li>
+                                        <li class="list-group-item"><a href="#" class="text-decoration-none">Persbericht: Nieuwe directie (Mei 2025)</a></li>
+                                        <li class="list-group-item"><a href="#" class="text-decoration-none">Interne Mededeling: Jaarafsluiting (Dec 2024)</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="admin-panel" class="content-section d-none">
+                <div class="p-4 bg-white rounded shadow-sm">
+                    <h2><i class="fas fa-tools me-2"></i> Admin Paneel</h2>
+                    <p>Welkom in het admin paneel. Hier kunt u gebruikers, content en GMS-instellingen beheren.</p>
+                    <div class="row mt-4">
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-users-cog me-2"></i> Gebruikersbeheer</h5>
+                                    <p class="card-text">Voeg gebruikers toe, bewerk rechten, reset wachtwoorden.</p>
+                                    <button class="btn btn-primary" id="manage-users-btn">Beheer Gebruikers</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-pencil-alt me-2"></i> Content Beheer</h5>
+                                    <p class="card-text">Beheer nieuwsberichten, documenten en evenementen.</p>
+                                    <button class="btn btn-primary" id="manage-content-btn">Beheer Content</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-cogs me-2"></i> GMS Instellingen</h5>
+                                    <p class="card-text">Configureer GMS-parameters en eenheden.</p>
+                                    <button class="btn btn-primary" id="manage-gms-btn">Beheer GMS</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eGYC7PTY/LSXL0J" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
 </html>
