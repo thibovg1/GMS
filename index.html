@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMS - Geïntegreerd Meldkamer Systeem</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">GMS</div>
+        <nav>
+            <ul>
+                <li><a href="#" data-section="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#" data-section="map"><i class="fas fa-map-marked-alt"></i> Kaart</a></li>
+                <li><a href="#" data-section="incidents"><i class="fas fa-exclamation-triangle"></i> Meldingen</a></li>
+                <li><a href="#" data-section="communication"><i class="fas fa-comments"></i> Communicatie</a></li>
+                <li><a href="#" data-section="settings"><i class="fas fa-cog"></i> Instellingen</a></li>
+            </ul>
+        </nav>
+        <div class="user-info">
+            Welkom, Centralist! <i class="fas fa-user-circle"></i>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="dashboard" class="content-section active">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="card active-incidents">
+                    <h3>Actieve Meldingen</h3>
+                    <p id="active-incidents-count">0</p>
+                </div>
+                <div class="card urgent-incidents">
+                    <h3>Urgent</h3>
+                    <p id="urgent-incidents-count">0</p>
+                </div>
+                <div class="card pending-units">
+                    <h3>Beschikbare Eenheden</h3>
+                    <p id="available-units-count">0</p>
+                </div>
+                <div class="card latest-updates">
+                    <h3>Laatste Updates</h3>
+                    <ul id="latest-updates-list">
+                        <li>Geen recente updates.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="map" class="content-section">
+            <h2><i class="fas fa-map-marked-alt"></i> Kaartweergave</h2>
+            <div id="map-container" style="height: 500px; background-color: #e0e0e0; border-radius: 8px;">
+                <p style="text-align: center; padding-top: 200px;">Kaart wordt hier geladen...</p>
+            </div>
+        </section>
+
+        <section id="incidents" class="content-section">
+            <h2><i class="fas fa-exclamation-triangle"></i> Meldingen</h2>
+            <div class="incident-list">
+                <div class="incident-header">
+                    <span>ID</span>
+                    <span>Type</span>
+                    <span>Locatie</span>
+                    <span>Status</span>
+                    <span>Tijd</span>
+                    <span>Actie</span>
+                </div>
+                <div id="incidents-container">
+                    <p style="text-align: center;">Geen meldingen om weer te geven.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="communication" class="content-section">
+            <h2><i class="fas fa-comments"></i> Communicatie</h2>
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message received">
+                        <span class="sender">Systeem:</span> Welkom in de communicatie ruimte.
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input" placeholder="Typ uw bericht...">
+                    <button id="send-message-btn"><i class="fas fa-paper-plane"></i> Verzenden</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="settings" class="content-section">
+            <h2><i class="fas fa-cog"></i> Instellingen</h2>
+            <p>Hier komen de systeeminstellingen.</p>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
