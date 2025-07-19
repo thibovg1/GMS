@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bedrijfsintranet</title>
+    <title>Inloggen - Intranet Regio 18</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -12,7 +12,7 @@
 
     <div id="login-section" class="d-flex align-items-center justify-content-center vh-100 bg-light">
         <div class="card p-4 shadow-lg" style="width: 400px;">
-            <h2 class="card-title text-center mb-4">Inloggen op Intranet</h2>
+            <h2 class="card-title text-center mb-4">Inloggen op Intranet Regio 18</h2>
             <form id="login-form">
                 <div class="mb-3">
                     <label for="username" class="form-label">Gebruikersnaam</label>
@@ -25,13 +25,17 @@
                 <button type="submit" class="btn btn-primary w-100">Login</button>
                 <div id="login-error" class="text-danger text-center mt-3 d-none">Ongeldige gebruikersnaam of wachtwoord.</div>
             </form>
+            <div class="mt-3 text-center">
+                <p>Nog geen account?</p>
+                <a href="register.html" class="btn btn-outline-secondary w-100">Registreren</a>
+            </div>
         </div>
     </div>
 
     <div id="intranet-section" class="d-none">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Bedrijfsintranet</a>
+                <a class="navbar-brand" href="#">Intranet Regio 18</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -121,7 +125,7 @@
                                 <div class="col-md-4 mb-3">
                                     <div class="card text-white bg-warning h-100">
                                         <div class="card-body">
-                                            <h5 class="card-title"><i class="fas fa-clock"></i> Urgent</h5>
+                                            <h5 class="card-title"><i class="fas fa-clock"></i> Urgent</div>
                                             <p class="card-text fs-1 fw-bold" id="urgent-incidents-count">0</p>
                                         </div>
                                     </div>
@@ -246,6 +250,25 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div id="gms-settings-container" class="mt-5 d-none">
+                        <h4><i class="fas fa-cogs me-2"></i> GMS Simulatie Instellingen</h4>
+                        <form id="gms-settings-form">
+                            <div class="mb-3">
+                                <label for="max-available-units" class="form-label">Maximaal aantal beschikbare eenheden:</label>
+                                <input type="number" class="form-control" id="max-available-units" min="1" value="25">
+                                <div class="form-text">Bepaalt de bovengrens voor de willekeurig gegenereerde beschikbare eenheden.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="incident-spawn-chance" class="form-label">Kans op nieuwe melding per interval (0.0 - 1.0):</label>
+                                <input type="number" class="form-control" id="incident-spawn-chance" step="0.01" min="0" max="1" value="0.3">
+                                <div class="form-text">Hogere waarde = meer meldingen. Standaard is 0.3 (30%).</div>
+                            </div>
+                            <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Instellingen Opslaan</button>
+                            <div id="gms-settings-success" class="text-success mt-2 d-none">Instellingen succesvol opgeslagen!</div>
+                        </form>
+                    </div>
+
                 </div>
             </section>
         </main>
@@ -254,4 +277,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eGYC7PTY/LSXL0J" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
-</html>
+</html> 
