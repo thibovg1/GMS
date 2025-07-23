@@ -121,12 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 users = []; // Reset if data is corrupt
             }
 
-            // Ensure superadmin always exists
+            // Ensure superadmin always exists (redundant, but good for resilience if login script failed)
             const superAdminExists = users.some(u => u.username === SUPERADMIN_USERNAME && u.role === 'superadmin');
             if (!superAdminExists) {
-                console.warn(`Superadmin '${SUPERADMIN_USERNAME}' not found, creating...`);
+                console.warn(`Superadmin '${SUPERADMIN_USERNAME}' not found in localStorage by dashboard, creating...`);
                 const superAdmin = {
-                    id: generateUniqueId(),
+                    id: 'superadmin_id_fixed', // Fixed ID for consistency
                     fullName: 'Global Super Admin',
                     username: SUPERADMIN_USERNAME,
                     password: SUPERADMIN_PASSWORD,
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 users.push(superAdmin);
                 simulatedBackend.saveAllUsers(users);
-                simulatedBackend.logAction(`System: Superadmin account '${SUPERADMIN_USERNAME}' created.`);
+                simulatedBackend.logAction(`System: Superadmin account '${SUPERADMIN_USERNAME}' created (via dashboard check).`);
             } else {
                 // Ensure existing superadmin has correct password/role (for resilience)
                 const existingSuperAdmin = users.find(u => u.username === SUPERADMIN_USERNAME);
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     existingSuperAdmin.password = SUPERADMIN_PASSWORD;
                     existingSuperAdmin.role = 'superadmin';
                     simulatedBackend.saveAllUsers(users);
-                    simulatedBackend.logAction(`System: Superadmin account '${SUPERADMIN_USERNAME}' details updated.`);
+                    simulatedBackend.logAction(`System: Superadmin account '${SUPERADMIN_USERNAME}' details updated (via dashboard check).`);
                 }
             }
             return users;
@@ -229,7 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Special checks for admin deletion
             if (userToDelete.role === 'superadmin') {
                 const allSuperAdmins = users.filter(u => u.role === 'superadmin');
-                if (allSuperAdmins.length === 1) { // Prevent deleting the last superadmin
+                if (allSuperAdmins.length === 1 && userToDelete.id === loggedInAdmin.id) { // Prevent deleting the ONLY superadmin if it's yourself
+                     return { success: false, message: 'U kunt uw eigen, enige superadmin-account niet verwijderen.' };
+                } else if (allSuperAdmins.length === 1) { // Prevent deleting the last superadmin by anyone
                     return { success: false, message: 'Kan de enige superadmin niet verwijderen.' };
                 }
             }
@@ -365,6 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const actionCell = row.insertCell();
             actionCell.className = 'action-buttons';
 
+            // Only Superadmin or Admin can manage users
             if (loggedInAdmin.role === 'superadmin' || loggedInAdmin.role === 'admin') {
                 if (user.status === 'pending') {
                     const approveButton = document.createElement('button');

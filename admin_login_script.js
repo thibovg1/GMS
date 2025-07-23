@@ -1,116 +1,105 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const adminLoginForm = document.getElementById('adminLoginForm');
-    const adminUsernameInput = document.getElementById('adminUsername');
-    const adminPasswordInput = document.getElementById('adminPassword');
-    const adminLoginMessage = document.getElementById('adminLoginMessage');
+    const loginForm = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('errorMessage');
 
-    // --- Gesimuleerde Backend Functies ---
-    const generateUniqueId = () => {
-        return Date.now() + Math.floor(Math.random() * 1000);
-    };
+    // Constants for Superadmin (MUST match admin_dashboard_script.js)
+    const SUPERADMIN_USERNAME = 'superadmin';
+    const SUPERADMIN_PASSWORD = 'adminpassword'; // Your Superadmin Password
 
-    const simulatedBackend = {
-        getAllUsers: () => {
-            const storedAllUsers = localStorage.getItem('gms_all_users');
-            let allUsers = [];
+    // Local Storage Key for Users
+    const LOCAL_STORAGE_USERS_KEY = 'gms_all_users';
 
-            if (storedAllUsers) {
-                allUsers = JSON.parse(storedAllUsers);
+    // Helper to get all users (including admins) from localStorage
+    const getAllUsers = () => {
+        let users = [];
+        try {
+            const storedUsers = localStorage.getItem(LOCAL_STORAGE_USERS_KEY);
+            if (storedUsers) {
+                users = JSON.parse(storedUsers);
             }
-
-            // Zorgt ervoor dat de superadmin altijd bestaat bij het laden van de pagina
-            const superAdminExists = allUsers.some(user => user.username === 'superadmin' && user.role === 'superadmin');
-            if (!superAdminExists) {
-                const superAdmin = {
-                    id: generateUniqueId(),
-                    fullName: 'Super Admin',
-                    username: 'superadmin',
-                    password: 'adminpassword',
-                    role: 'superadmin',
-                    email: 'super@admin.com',
-                    status: 'approved'
-                };
-                allUsers.push(superAdmin);
-                simulatedBackend.saveAllUsers(allUsers);
-            }
-            
-            return allUsers;
-        },
-        saveAllUsers: (users) => {
-            localStorage.setItem('gms_all_users', JSON.stringify(users));
-        },
-        adminLogin: (username, password) => {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    const allUsers = simulatedBackend.getAllUsers();
-                    // Zoek naar een gebruiker die admin of superadmin is en overeenkomt met de credentials
-                    const adminUser = allUsers.find(u => 
-                        u.username === username && u.password === password && 
-                        (u.role === 'admin' || u.role === 'superadmin')
-                    );
-
-                    if (adminUser) {
-                        // De superadmin hoeft niet expliciet een aparte tak te hebben hier,
-                        // omdat de rol al in `adminUser.role` staat en die wordt teruggegeven.
-                        // Belangrijk is dat *elke* admin (incl. superadmin) de status 'approved' moet hebben om hier te slagen,
-                        // tenzij je de superadmin ook hier een bypass geeft voor de 'status' check,
-                        // wat voor admins minder gebruikelijk is dan voor reguliere logins.
-                        // In ons model is de superadmin's status al 'approved' bij creatie, dus dit is OK.
-
-                        if (adminUser.status === 'approved') {
-                            resolve({ success: true, message: 'Admin login succesvol!', admin: { id: adminUser.id, username: adminUser.username, role: adminUser.role } });
-                        } else {
-                            reject({ success: false, message: 'Je admin account is nog niet goedgekeurd of is afgekeurd.' });
-                        }
-                    } else {
-                        reject({ success: false, message: 'Ongeldige admin gebruikersnaam of wachtwoord.' });
-                    }
-                }, 500);
-            });
+        } catch (e) {
+            console.error("Error parsing users from localStorage, resetting:", e);
+            users = []; // Reset if data is corrupt
         }
+
+        // Ensure the superadmin account exists in localStorage
+        const superAdminExists = users.some(u => u.username === SUPERADMIN_USERNAME && u.role === 'superadmin');
+        if (!superAdminExists) {
+            console.warn(`Superadmin '${SUPERADMIN_USERNAME}' not found in localStorage, creating...`);
+            const superAdmin = {
+                id: 'superadmin_id_fixed', // Fixed ID for consistency
+                fullName: 'Global Super Admin',
+                username: "superadmin",
+                password: "adminpassword",
+                role: 'superadmin',
+                email: 'superadmin@global.com',
+                status: 'approved'
+            };
+            users.push(superAdmin);
+            localStorage.setItem(LOCAL_STORAGE_USERS_KEY, JSON.stringify(users));
+            console.log("Superadmin account ensured in localStorage.");
+        } else {
+            // Ensure existing superadmin has correct password/role (for resilience)
+            const existingSuperAdmin = users.find(u => u.username === SUPERADMIN_USERNAME);
+            if (existingSuperAdmin && (existingSuperAdmin.password !== SUPERADMIN_PASSWORD || existingSuperAdmin.role !== 'superadmin')) {
+                console.warn("Existing superadmin has incorrect password or role, updating...");
+                existingSuperAdmin.password = SUPERADMIN_PASSWORD;
+                existingSuperAdmin.role = 'superadmin';
+                localStorage.setItem(LOCAL_STORAGE_USERS_KEY, JSON.stringify(users));
+                console.log(`Superadmin account '${SUPERADMIN_USERNAME}' details updated in localStorage.`);
+            }
+        }
+        return users;
     };
-    // --- Einde Gesimuleerde Backend Functies ---
 
-    function displayMessage(message, type) {
-        adminLoginMessage.textContent = message;
-        adminLoginMessage.className = `message ${type}`;
-        adminLoginMessage.style.display = 'block';
-    }
+    // Ensure superadmin exists on page load (good for initial setup and recovery)
+    getAllUsers();
 
-    function hideMessage() {
-        adminLoginMessage.style.display = 'none';
-        adminLoginMessage.classList.remove('success', 'error');
-    }
-
-    adminLoginForm.addEventListener('submit', async (e) => {
+    loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        hideMessage();
+        errorMessage.textContent = ''; // Clear previous errors
 
-        const username = adminUsernameInput.value;
-        const password = adminPasswordInput.value;
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
 
-        if (!username || !password) {
-            displayMessage('Vul alstublieft uw gebruikersnaam en wachtwoord in.', 'error');
+        // Directly check for Superadmin login (hardcoded for initial access)
+        if (username === SUPERADMIN_USERNAME && password === SUPERADMIN_PASSWORD) {
+            const adminUser = {
+                id: 'superadmin_id_fixed', // Use fixed ID
+                username: "superadmin",
+                role: 'superadmin',
+                fullName: 'Global Super Admin'
+            };
+            sessionStorage.setItem('loggedInAdmin', JSON.stringify(adminUser));
+            console.log('Superadmin login successful.');
+            window.location.href = 'admin_dashboard.html';
             return;
         }
 
-        try {
-            const response = await simulatedBackend.adminLogin(username, password);
-            if (response.success) {
-                sessionStorage.setItem('loggedInAdmin', JSON.stringify(response.admin)); // Sla de rol op
-                displayMessage(response.message, 'success');
-                // Kleine vertraging voor de gebruiker om het bericht te zien
-                setTimeout(() => {
-                    window.location.href = 'admin_dashboard.html'; 
-                }, 500);
+        // Check other admin/user logins from localStorage
+        const allUsers = getAllUsers(); // Re-fetch to ensure superadmin is in list if it was just added
+        const foundUser = allUsers.find(user => user.username === username && user.password === password);
+
+        if (foundUser) {
+            // Check if it's an admin account (admin or superadmin)
+            if (foundUser.role === 'admin' || foundUser.role === 'superadmin') {
+                if (foundUser.status === 'approved') {
+                    // Store admin user data in sessionStorage
+                    sessionStorage.setItem('loggedInAdmin', JSON.stringify(foundUser));
+                    console.log('Admin login successful for:', foundUser.username);
+                    window.location.href = 'admin_dashboard.html';
+                } else if (foundUser.status === 'pending') {
+                    errorMessage.textContent = 'Uw account wacht op goedkeuring.';
+                } else { // rejected
+                    errorMessage.textContent = 'Uw account is afgewezen.';
+                }
             } else {
-                displayMessage(response.message, 'error');
+                errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord voor admin toegang.';
             }
-        } catch (error) {
-            displayMessage(error.message || 'Login mislukt: Onbekende fout', 'error');
-            console.error('Admin Login fout:', error);
+        } else {
+            errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord.';
         }
     });
-
-    simulatedBackend.getAllUsers();
 });
