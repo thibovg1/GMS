@@ -75,6 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Afdelingen die geen roepnummer invulveld nodig hebben
     const noCallsignDepartments = ["Meldkamer", "Burger"];
+    // Afdelingen die doorgestuurd moeten worden naar afdeling_informatie.html
+    const infoPageDepartments = ["Politie", "Brandweer", "Ambulance", "Prorail"];
 
     function displayMessage(message, type) {
         selectionMessage.textContent = message;
@@ -89,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (!loggedInUser) {
-        window.location.href = 'index.html';
+        window.location.href = 'index.html'; // Terug naar login als niet ingelogd
         return;
     }
     loggedInUsernameSpan.textContent = loggedInUser.username;
@@ -185,11 +187,29 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         sessionStorage.setItem('loggedInUser', JSON.stringify(userWithSelections));
 
+        // Opslaan van actieve sessies (voor de meldkamer om op te halen)
+        // Dit is een simpele manier om bij te houden wie ingelogd is
+        let allSessions = JSON.parse(sessionStorage.getItem('gms_logged_in_sessions')) || [];
+        // Verwijder de oude sessie van deze gebruiker als die bestaat
+        allSessions = allSessions.filter(session => session.id !== userWithSelections.id);
+        allSessions.push(userWithSelections); // Voeg de bijgewerkte sessie toe
+        sessionStorage.setItem('gms_logged_in_sessions', JSON.stringify(allSessions));
+
+
         displayMessage(`Sessie gestart als ${loggedInUser.username} (${selectedDepartment} - ${selectedSpecialization}${selectedCallsign !== "N.v.t." ? " - " + selectedCallsign : ""})! U wordt doorgestuurd...`, 'success');
         
-        // Simuleer een kleine vertraging voordat je doorstuurt
+        // Logica voor het doorsturen naar de juiste pagina
         setTimeout(() => {
-            window.location.href = 'afdeling_info.html'; // Dit zou de pagina moeten zijn waar je de afdelingsinfo toont
+            if (selectedDepartment === 'Meldkamer') {
+                window.location.href = 'meldkamer_melding_aanmaken.html'; // Stuur naar meldkamer pagina
+            } else if (infoPageDepartments.includes(selectedDepartment)) {
+                window.location.href = 'afdeling_informatie.html'; // Stuur naar algemene infopagina voor eenheden
+            } else {
+                // Voor 'Burger' (of andere toekomstige afdelingen zonder specifieke pagina)
+                alert(`Welkom bij Afdeling: ${selectedDepartment} - ${selectedSpecialization}`);
+                // Optioneel: stuur ze hierheen als er een 'burger_info.html' is
+                // window.location.href = 'burger_info.html'; 
+            }
         }, 1500);
     });
 
@@ -200,8 +220,4 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutLink) {
         logoutLink.href = 'index.html'; 
     }
-
-    // Initial check to hide callsign select if "Meldkamer" or "Burger" is default/preselected
-    // This is useful if you had a saved selection or if you want to set a default.
-    // For now, it will apply when the department is changed.
 });

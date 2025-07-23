@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meldkamer - Melding Aanmaken</title>
+    <link rel="stylesheet" href="meldkamer_melding_aanmaken_style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Meldkamer - Melding Aanmaken</h1>
+        <p>Welkom, <span id="loggedInMeldkamerUsername"></span> (<span id="loggedInMeldkamerSpecialization"></span>)</p>
+
+        <div class="melding-form-section">
+            <h2>Nieuwe Melding Aanmaken</h2>
+            <form id="createMeldingForm">
+                <div class="input-group">
+                    <label for="meldingType">Type Melding:</label>
+                    <select id="meldingType" required>
+                        <option value="">-- Selecteer Type --</option>
+                        <option value="Brand">Brand</option>
+                        <option value="Verkeersongeval">Verkeersongeval</option>
+                        <option value="Medisch Noodgeval">Medisch Noodgeval</option>
+                        <option value="Overval">Overval</option>
+                        <option value="Vechtpartij">Vechtpartij</option>
+                        <option value="Vermis">Vermis</option>
+                        <option value="Spoordijk Incident">Spoordijk Incident</option>
+                        <option value="Wateroverlast">Wateroverlast</option>
+                        <option value="Anders">Anders</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="meldingPrioriteit">Prioriteit:</label>
+                    <select id="meldingPrioriteit" required>
+                        <option value="P1">P1 (Spoed)</option>
+                        <option value="P2">P2 (Prioriteit)</option>
+                        <option value="P3">P3 (Geen Spoed)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="meldingLocatie">Locatie:</label>
+                    <input type="text" id="meldingLocatie" placeholder="Straatnaam Huisnummer, Stad" required>
+                </div>
+                <div class="input-group">
+                    <label for="meldingOmschrijving">Omschrijving:</label>
+                    <textarea id="meldingOmschrijving" rows="4" placeholder="Korte omschrijving van de situatie" required></textarea>
+                </div>
+                <button type="submit" class="button create-button">Melding Aanmaken</button>
+                <p id="createMeldingMessage" class="message" style="display:none;"></p>
+            </form>
+        </div>
+
+        <div class="unit-koppeling-section">
+            <h2>Meldingen & Eenheden Koppelen</h2>
+            <div class="table-container">
+                <table id="openMeldingenTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Prioriteit</th>
+                            <th>Locatie</th>
+                            <th>Status</th>
+                            <th>Gekoppelde Eenheden</th>
+                            <th>Actie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+
+            <div id="unitSelectionModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h2>Koppel Eenheden aan Melding <span id="modalMeldingId"></span></h2>
+                    <p>Type: <span id="modalMeldingType"></span></p>
+                    <p>Locatie: <span id="modalMeldingLocatie"></span></p>
+
+                    <div class="available-units">
+                        <h3>Beschikbare Eenheden</h3>
+                        <p>Selecteer een eenheid om te koppelen:</p>
+                        <div id="availableUnitsList">
+                            </div>
+                    </div>
+                    <button id="confirmKoppelingButton" class="button confirm-button">Koppel Geselecteerde Eenheden</button>
+                    <p id="koppelingMessage" class="message" style="display:none;"></p>
+                </div>
+            </div>
+        </div>
+        
+        <a href="index.html" class="logout-link">Uitloggen</a>
+    </div>
+    <script src="meldkamer_melding_aanmaken_script.js"></script>
+</body>
+</html>
