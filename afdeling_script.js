@@ -8,17 +8,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectionMessage = document.getElementById('selectionMessage');
 
     const departmentsData = {
-        "Brandweer": {
+        "Politie": {
             "Blussen": ["BRW-001", "BRW-002", "BRW-003"],
             "Redding": ["RD-001", "RD-002", "RD-003"]
         },
-        "Politie": {
+        "Brandweer": {
             "Patrouille": ["POL-A01", "POL-A02", "POL-A03"],
             "Recherche": ["POL-B01", "POL-B02"]
         },
         "Ambulance": {
             "Spoed": ["AMB-101", "AMB-102"],
             "Vervoer": ["AMB-201"]
+        },
+
+         "Veiligheidsregio": {
+            "Blussen": ["BRW-001", "BRW-002", "BRW-003"],
+            "Redding": ["RD-001", "RD-002", "RD-003"]
+        },
+        "Meldkamer": {
+            "Centralist Intake": ["POL-A01", "POL-A02", "POL-A03"],
+            "Centralist": ["POL-B01", "POL-B02"]
+        },
+        "Burger": {
+            "Vuurwapen Bevoegd": ["AMB-101", "AMB-102"],
+            "Niet Vuurwapen Bevoegd": ["AMB-201"]
         }
     };
 
