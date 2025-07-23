@@ -1,226 +1,153 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const loggedInUsernameSpan = document.getElementById('loggedInUsername');
-    const selectionForm = document.getElementById('selectionForm');
-    const departmentSelect = document.getElementById('departmentSelect');
-    const specializationSelect = document.getElementById('specializationSelect');
-    const callsignSelect = document.getElementById('callsignSelect');
-    const selectionMessage = document.getElementById('selectionMessage');
+    const afdelingForm = document.getElementById('afdelingForm');
+    const departmentSelect = document.getElementById('department');
+    const specializationGroup = document.getElementById('specializationGroup');
+    const specializationSelect = document.getElementById('specialization');
+    const callsignGroup = document.getElementById('callsignGroup');
+    const callsignInput = document.getElementById('callsign');
+    const afdelingMessage = document.getElementById('afdelingMessage');
+    const unitStatusGroup = document.getElementById('unitStatusGroup');
+    const unitStatusSelect = document.getElementById('unitStatus');
 
-    const departmentsData = {
-        "Brandweer": {
-            "Blusgroep": ["18-1131", "18-1132", "18-1133", "18-1134", "18-1135"],
-            "Tankautospuit": ["18-1130", "18-1140", "18-1150", "18-1160"],
-            "Autoladder": ["18-1191", "18-1192"],
-            "Waterongevallen": ["18-1171", "18-1172", "18-1173"],
-            "Hulpverlening": ["18-1181", "18-1182"],
-            "Duikteam": ["18-1175", "18-1176", "18-1177"],
-            "Materieel en Logistiek": ["18-1100", "18-1101", "18-1102", "18-1103"],
-            "Adembescherming": ["18-1110", "18-1111"],
-            "Officiersploeg": ["18-1001", "18-1002", "18-1003", "18-1004", "18-1005"]
-        },
-        "Politie": {
-            "Noodhulp": ["18-P-01", "18-P-02", "18-P-03", "18-P-04", "18-P-05", "18-P-06", "18-P-07", "18-P-08", "18-P-09", "18-P-10"],
-            "Verkeerspolitie": ["18-V-01", "18-V-02", "18-V-03", "18-V-04"],
-            "Hondenbrigade": ["18-H-01", "18-H-02", "18-H-03"],
-            "Recherche": ["18-R-01", "18-R-02", "18-R-03", "18-R-04", "18-R-05", "18-R-06", "18-R-07", "18-R-08"],
-            "Wijkagenten": ["18-WA-01", "18-WA-02", "18-WA-03", "18-WA-04", "18-WA-05"],
-            "Surveillance": ["18-S-01", "18-S-02", "18-S-03", "18-S-04", "18-S-05", "18-S-06", "18-S-07"],
-            "Mobiele Eenheid (ME)": ["18-ME-01", "18-ME-02", "18-ME-03", "18-ME-04"],
-            "Brigadier": ["18-B-01", "18-B-02", "18-B-03"],
-            "Hoofdagent": ["18-HA-01", "18-HA-02", "18-HA-03"],
-            "Coördinator": ["18-CO-01", "18-CO-02"]
-        },
-        "Ambulance": {
-            "Spoedrit (A1)": ["18-101", "18-102", "18-103", "18-104", "18-105", "18-106", "18-107", "18-108"],
-            "Spoedrit (A2)": ["18-201", "18-202", "18-203", "18-204", "18-205"],
-            "Besteld Vervoer (B)": ["18-301", "18-302", "18-303", "18-304"],
-            "Middel Zorg": ["18-MZ-01", "18-MZ-02", "18-MZ-03"],
-            "Officier van Dienst Geneeskundig (OvD-G)": ["18-OVDG-01", "18-OVDG-02"],
-            "Verpleegkundig Specialist": ["18-VS-01", "18-VS-02"],
-            "Rapid Responder": ["18-RR-01", "18-RR-02"],
-            "Ambulance Motor": ["18-M-01", "18-M-02"]
-        },
-        "Prorail": {
-            "Storingen & Incidenten": ["18-PR-01", "18-PR-02", "18-PR-03", "18-PR-04", "18-PR-05", "18-PR-06"],
-            "Spoedreparaties": ["18-PR-R1", "18-PR-R2", "18-PR-R3"],
-            "Inspectie": ["18-PR-I1", "18-PR-I2", "18-PR-I3"],
-            "Veiligheidscoördinatie": ["18-PR-V1", "18-PR-V2"],
-            "Calamiteiten Team": ["18-PR-CT1", "18-PR-CT2", "18-PR-CT3"],
-            "Logistiek": ["18-PR-L1", "18-PR-L2"],
-            "Communicatie": ["18-PR-C1", "18-PR-C2"]
-        },
-        "Meldkamer": {
-            "Algemene Meldkamer": [],
-            "Centralist Noodhulp": [],
-            "Centralist Brandweer": [],
-            "Centralist Ambulance": [],
-            "Centralist Prorail": [],
-            "Hoofd Centralist": [],
-            "Officier van Dienst (Meldkamer)": [],
-            "Ondersteuning": [],
-            "Communicatie Specialist": []
-        },
-        "Burger": {
-            "Burger Inwoner": [],
-            "Burger Hulpverlener": [],
-            "Getuige": [],
-            "Betrokkene": [],
-            "Verkeersregelaar (Vrijwillig)": [],
-            "Buurtwacht (Vrijwillig)": [],
-            "EHBO (Vrijwillig)": [],
-            "Omstander": [],
-            "Slachtoffer": []
-        }
-    };
+    let loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
 
-    // Afdelingen die geen roepnummer invulveld nodig hebben
-    const noCallsignDepartments = ["Meldkamer", "Burger"];
-    
-    // DEFINIEER DE HULPDIENSTEN DIE NAAR AFDELING_INFO GAAN
-    const helpdeskDepartments = ["Brandweer", "Politie", "Ambulance", "Prorail"]; 
-
-    function displayMessage(message, type) {
-        selectionMessage.textContent = message;
-        selectionMessage.className = `message ${type}`;
-        selectionMessage.style.display = 'block';
-    }
-
-    function hideMessage() {
-        selectionMessage.style.display = 'none';
-        selectionMessage.classList.remove('success', 'error');
-    }
-
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    // Als er geen ingelogde gebruiker is, stuur terug naar de loginpagina
     if (!loggedInUser) {
-        window.location.href = 'index.html'; // Terug naar login als niet ingelogd
+        window.location.href = 'index.html';
         return;
     }
-    loggedInUsernameSpan.textContent = loggedInUser.username;
 
-    function populateDepartments() {
-        departmentSelect.innerHTML = '<option value="">-- Selecteer Afdeling --</option>';
-        Object.keys(departmentsData).forEach(dept => {
-            const option = document.createElement('option');
-            option.value = dept;
-            option.textContent = dept;
-            departmentSelect.appendChild(option);
-        });
-    }
+    // Array van afdelingen die specialisaties en eenhedenstatus vereisen
+    const helpdeskDepartments = ['Brandweer', 'Politie', 'Ambulance', 'Prorail'];
+
+    // Update de zichtbaarheid van specialisatie en callsign op basis van afdeling
+    departmentSelect.addEventListener('change', () => {
+        const selectedDepartment = departmentSelect.value;
+        if (helpdeskDepartments.includes(selectedDepartment)) {
+            specializationGroup.style.display = 'block';
+            callsignGroup.style.display = 'block';
+            unitStatusGroup.style.display = 'block';
+            populateSpecializations(selectedDepartment);
+        } else {
+            specializationGroup.style.display = 'none';
+            callsignGroup.style.display = 'none';
+            unitStatusGroup.style.display = 'none';
+        }
+    });
 
     function populateSpecializations(department) {
         specializationSelect.innerHTML = '<option value="">-- Selecteer Specialisatie --</option>';
-        if (department && departmentsData[department]) {
-            Object.keys(departmentsData[department]).forEach(spec => {
-                const option = document.createElement('option');
-                option.value = spec;
-                option.textContent = spec;
-                specializationSelect.appendChild(option);
-            });
+        let specializations = [];
+
+        switch (department) {
+            case 'Brandweer':
+                specializations = ['Algemeen', 'Verkenning', 'Redding', 'TS', 'HW', 'WO'];
+                break;
+            case 'Politie':
+                specializations = ['Algemeen', 'Verkeer', 'Hondenbrigade', 'Arrestatieteam', 'ME'];
+                break;
+            case 'Ambulance':
+                specializations = ['Algemeen', 'Rapid Responder', 'MMT'];
+                break;
+            case 'Prorail':
+                specializations = ['Algemeen', 'Spooronderhoud', 'Calamiteiten'];
+                break;
+            default:
+                break;
         }
+
+        specializations.forEach(spec => {
+            const option = document.createElement('option');
+            option.value = spec;
+            option.textContent = spec;
+            specializationSelect.appendChild(option);
+        });
     }
 
-    function populateCallsigns(department, specialization) {
-        callsignSelect.innerHTML = '<option value="">-- Selecteer Roepnummer --</option>';
-        // Verberg/toon het roepnummer selectieveld afhankelijk van de afdeling
-        if (noCallsignDepartments.includes(department)) {
-            callsignSelect.style.display = 'none';
-            callsignSelect.required = false; // Maak het niet verplicht
-        } else {
-            callsignSelect.style.display = 'block';
-            callsignSelect.required = true; // Maak het wel verplicht
-            if (department && specialization && departmentsData[department] && departmentsData[department][specialization]) {
-                departmentsData[department][specialization].forEach(callsign => {
-                    const option = document.createElement('option');
-                    option.value = callsign;
-                    option.textContent = callsign;
-                    callsignSelect.appendChild(option);
-                });
-            }
-        }
+    function displayMessage(message, type) {
+        afdelingMessage.textContent = message;
+        afdelingMessage.className = `message ${type}`;
+        afdelingMessage.style.display = 'block';
     }
 
-    departmentSelect.addEventListener('change', () => {
-        const selectedDepartment = departmentSelect.value;
-        specializationSelect.value = "";
-        callsignSelect.value = "";
-        populateSpecializations(selectedDepartment);
-        populateCallsigns(selectedDepartment, ""); // Roep aan met de geselecteerde afdeling
-        hideMessage();
-    });
+    function hideMessage() {
+        afdelingMessage.style.display = 'none';
+        afdelingMessage.classList.remove('success', 'error');
+    }
 
-    specializationSelect.addEventListener('change', () => {
-        const selectedDepartment = departmentSelect.value;
-        const selectedSpecialization = specializationSelect.value;
-        callsignSelect.value = "";
-        populateCallsigns(selectedDepartment, selectedSpecialization);
-        hideMessage();
-    });
-
-    selectionForm.addEventListener('submit', (e) => {
+    afdelingForm.addEventListener('submit', (e) => {
         e.preventDefault();
         hideMessage();
 
         const selectedDepartment = departmentSelect.value;
         const selectedSpecialization = specializationSelect.value;
-        let selectedCallsign = callsignSelect.value; // Kan leeg zijn voor Meldkamer/Burger
+        const callsign = callsignInput.value.trim();
+        const unitStatus = unitStatusSelect.value;
 
-        if (!selectedDepartment || !selectedSpecialization) {
-            displayMessage('Vul alstublieft de afdeling en specialisatie in.', 'error');
+        if (!selectedDepartment) {
+            displayMessage('Selecteer alstublieft een afdeling.', 'error');
             return;
         }
 
-        // Als de afdeling een roepnummer vereist, controleer dan of deze is ingevuld
-        if (!noCallsignDepartments.includes(selectedDepartment) && !selectedCallsign) {
-            displayMessage('Vul alstublieft ook uw roepnummer in.', 'error');
-            return;
+        if (helpdeskDepartments.includes(selectedDepartment)) {
+            if (!selectedSpecialization) {
+                displayMessage('Selecteer alstublieft een specialisatie.', 'error');
+                return;
+            }
+            if (!callsign) {
+                displayMessage('Voer alstublieft een roepnaam in.', 'error');
+                return;
+            }
+            if (!unitStatus) {
+                displayMessage('Selecteer alstublieft een eenheid status.', 'error');
+                return;
+            }
         }
 
-        // Voor Meldkamer en Burger, stel roepnummer in op "N.v.t." of null
-        if (noCallsignDepartments.includes(selectedDepartment)) {
-            selectedCallsign = "N.v.t."; 
-        }
+        // Update de loggedInUser in sessionStorage met de gekozen afdeling en specialisatie/roepnaam
+        loggedInUser.department = selectedDepartment;
+        loggedInUser.specialization = helpdeskDepartments.includes(selectedDepartment) ? selectedSpecialization : null;
+        loggedInUser.callsign = helpdeskDepartments.includes(selectedDepartment) ? callsign : null;
+        loggedInUser.unitStatus = helpdeskDepartments.includes(selectedDepartment) ? unitStatus : null;
 
-        const userWithSelections = {
-            ...loggedInUser,
-            department: selectedDepartment,
-            specialization: selectedSpecialization,
-            callsign: selectedCallsign
-        };
-        sessionStorage.setItem('loggedInUser', JSON.stringify(userWithSelections));
+        sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
-        // Opslaan van actieve sessies (voor de meldkamer om op te halen)
+        // Beheer van actieve sessies (simulatie van ingelogde eenheden)
         let allSessions = JSON.parse(sessionStorage.getItem('gms_logged_in_sessions')) || [];
-        allSessions = allSessions.filter(session => session.id !== userWithSelections.id);
-        allSessions.push(userWithSelections);
+        // Verwijder de oude sessie van deze gebruiker indien aanwezig
+        allSessions = allSessions.filter(session => session.id !== loggedInUser.id);
+        // Voeg de bijgewerkte sessie toe
+        allSessions.push({ 
+            id: loggedInUser.id, 
+            username: loggedInUser.username,
+            department: loggedInUser.department, 
+            specialization: loggedInUser.specialization,
+            callsign: loggedInUser.callsign,
+            unitStatus: loggedInUser.unitStatus,
+            role: loggedInUser.role, // Voeg de rol toe voor context
+            currentMeldingen: [] // Eenheden ontvangen hier meldingen
+        });
         sessionStorage.setItem('gms_logged_in_sessions', JSON.stringify(allSessions));
 
-        displayMessage(`Sessie gestart als ${loggedInUser.username} (${selectedDepartment} - ${selectedSpecialization}${selectedCallsign !== "N.v.t." ? " - " + selectedCallsign : ""})! U wordt doorgestuurd...`, 'success');
-        
-        // --- GEWIJZIGDE LOGICA VOOR DOORSTUREN ---
+        displayMessage('Afdeling succesvol geselecteerd! U wordt doorgestuurd...', 'success');
+
+        // Navigeer naar de juiste pagina
         setTimeout(() => {
             if (selectedDepartment === 'Meldkamer') {
-                window.location.href = 'meldkamer_melding_aanmaken.html'; // Stuur naar meldkamer pagina
-            } else if (helpdeskDepartments.includes(selectedDepartment)) { // GEWIJZIGDE CHECK
-                window.location.href = 'afdeling_info.html'; // Stuur naar algemene infopagina voor hulpdiensten
+                window.location.href = 'meldkamer_dashboard.html';
+            } else if (helpdeskDepartments.includes(selectedDepartment)) {
+                window.location.href = 'afdeling_info.html'; // Dit kan de algemene pagina voor hulpdiensten zijn
             } else if (selectedDepartment === 'Burger') {
-                alert(`Welkom als Burger: ${selectedSpecialization}`);
-                // Optioneel: stuur de burger naar een specifieke 'burger_info.html'
-                // window.location.href = 'burger_info.html';
-                // Voor nu blijft de alert en blijft men op de afdeling selectie pagina.
-                // Of als je wilt, stuur ze naar een algemene "welkom" pagina voor burgers:
-                // window.location.href = 'burger_welcome.html';
+                alert(`Welkom als Burger: ${loggedInUser.username}`);
+                // Optioneel: doorsturen naar een burger-specifieke pagina indien gemaakt
+                window.location.href = 'index.html'; // Of een burger-dashboard
             } else {
-                // Mocht er een onverwachte afdeling zijn die niet in de bovenstaande categorieën valt
-                alert(`Welkom bij Afdeling: ${selectedDepartment} - ${selectedSpecialization}`);
+                alert(`Welkom bij Afdeling: ${selectedDepartment}`);
+                window.location.href = 'index.html'; // Of een algemeen dashboard
             }
         }, 1500);
     });
 
-    populateDepartments();
-
-    // Update de uitloglink om naar de nieuwe index.html te verwijzen
-    const logoutLink = document.querySelector('.logout-link a');
-    if (logoutLink) {
-        logoutLink.href = 'index.html'; 
-    }
+    // Initialiseer de dropdowns indien nodig
+    departmentSelect.dispatchEvent(new Event('change'));
 });

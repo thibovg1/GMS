@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     password: 'adminpassword',
                     role: 'superadmin',
                     email: 'super@admin.com',
-                    status: 'approved' // Superadmin is altijd goedgekeurd
+                    status: 'approved'
                 };
                 allUsers.push(superAdmin);
                 simulatedBackend.saveAllUsers(allUsers);
@@ -41,20 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         adminLogin: (username, password) => {
             return new Promise((resolve, reject) => {
-                setTimeout(() => { // Simuleer netwerkvertraging
+                setTimeout(() => {
                     const allUsers = simulatedBackend.getAllUsers();
+                    // Zoek naar een gebruiker die admin of superadmin is en overeenkomt met de credentials
                     const adminUser = allUsers.find(u => 
                         u.username === username && u.password === password && 
                         (u.role === 'admin' || u.role === 'superadmin')
                     );
 
                     if (adminUser) {
-                        // Superadmin krijgt altijd toegang als de credentials kloppen, ongeacht de 'status' field
-                        if (adminUser.username === 'superadmin' && adminUser.password === 'adminpassword' && adminUser.role === 'superadmin') {
-                             resolve({ success: true, message: 'Superadmin login succesvol!', admin: { id: adminUser.id, username: adminUser.username, role: adminUser.role } });
-                        } 
-                        // Andere admins moeten goedgekeurd zijn
-                        else if (adminUser.status === 'approved') {
+                        // De superadmin hoeft niet expliciet een aparte tak te hebben hier,
+                        // omdat de rol al in `adminUser.role` staat en die wordt teruggegeven.
+                        // Belangrijk is dat *elke* admin (incl. superadmin) de status 'approved' moet hebben om hier te slagen,
+                        // tenzij je de superadmin ook hier een bypass geeft voor de 'status' check,
+                        // wat voor admins minder gebruikelijk is dan voor reguliere logins.
+                        // In ons model is de superadmin's status al 'approved' bij creatie, dus dit is OK.
+
+                        if (adminUser.status === 'approved') {
                             resolve({ success: true, message: 'Admin login succesvol!', admin: { id: adminUser.id, username: adminUser.username, role: adminUser.role } });
                         } else {
                             reject({ success: false, message: 'Je admin account is nog niet goedgekeurd of is afgekeurd.' });
@@ -94,9 +97,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await simulatedBackend.adminLogin(username, password);
             if (response.success) {
-                sessionStorage.setItem('loggedInAdmin', JSON.stringify(response.admin));
+                sessionStorage.setItem('loggedInAdmin', JSON.stringify(response.admin)); // Sla de rol op
                 displayMessage(response.message, 'success');
-                window.location.href = 'admin_dashboard.html'; 
+                // Kleine vertraging voor de gebruiker om het bericht te zien
+                setTimeout(() => {
+                    window.location.href = 'admin_dashboard.html'; 
+                }, 500);
             } else {
                 displayMessage(response.message, 'error');
             }
@@ -106,6 +112,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Zorg ervoor dat de superadmin bestaat bij het laden van de pagina
     simulatedBackend.getAllUsers();
 });

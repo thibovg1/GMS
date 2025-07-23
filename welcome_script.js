@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
     const loginMessage = document.getElementById('loginMessage');
 
-    // --- Gesimuleerde Backend (gelijk aan die in andere scripts) ---
+    // --- Gesimuleerde Backend Functies ---
+    // Deze functies zijn identiek in alle scripts die met gebruikersdata werken
     const generateUniqueId = () => {
         return Date.now() + Math.floor(Math.random() * 1000);
     };
@@ -18,20 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 allUsers = JSON.parse(storedAllUsers);
             }
 
-            // Zorgt ervoor dat de superadmin altijd bestaat bij het laden van de pagina
+            // Zorgt ervoor dat de superadmin altijd bestaat en correct is gedefinieerd
             const superAdminExists = allUsers.some(user => user.username === 'superadmin' && user.role === 'superadmin');
             if (!superAdminExists) {
                 const superAdmin = {
                     id: generateUniqueId(),
                     fullName: 'Super Admin',
                     username: 'superadmin',
-                    password: 'adminpassword',
-                    role: 'superadmin',
+                    password: 'adminpassword', // Dit is het wachtwoord
+                    role: 'superadmin', // Cruciale roldefinitie
                     email: 'super@admin.com',
                     status: 'approved' // Superadmin is altijd goedgekeurd
                 };
                 allUsers.push(superAdmin);
-                simulatedBackend.saveAllUsers(allUsers);
+                simulatedBackend.saveAllUsers(allUsers); // Sla direct op na toevoegen
             }
             
             return allUsers;
@@ -41,16 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         loginUser: (username, password) => {
             return new Promise((resolve, reject) => {
-                setTimeout(() => { // Simuleer netwerkvertraging
+                setTimeout(() => {
                     const allUsers = simulatedBackend.getAllUsers();
                     const user = allUsers.find(u => u.username === username && u.password === password);
 
                     if (user) {
-                        // Speciale check voor superadmin: altijd toegang als de credentials kloppen
+                        // Superadmin bypasses status check
                         if (user.username === 'superadmin' && user.password === 'adminpassword' && user.role === 'superadmin') {
                             resolve({ success: true, message: 'Superadmin login succesvol!', user: { id: user.id, username: user.username, role: user.role } });
                         } 
-                        // Reguliere gebruikers (of andere admins) moeten goedgekeurd zijn
+                        // Reguliere gebruikers en andere admins moeten goedgekeurd zijn
                         else if (user.status === 'approved') {
                             resolve({ success: true, message: 'Login succesvol!', user: { id: user.id, username: user.username, role: user.role } });
                         } else if (user.status === 'pending') {
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     };
-    // --- Einde Gesimuleerde Backend ---
+    // --- Einde Gesimuleerde Backend Functies ---
 
     function displayMessage(message, type) {
         loginMessage.textContent = message;
@@ -95,7 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.success) {
                 sessionStorage.setItem('loggedInUser', JSON.stringify(response.user));
                 displayMessage(response.message, 'success');
-                window.location.href = 'afdeling.html'; 
+                // Kleine vertraging voor de gebruiker om het bericht te zien
+                setTimeout(() => {
+                    window.location.href = 'afdeling.html'; 
+                }, 500);
             } else {
                 displayMessage(response.message, 'error');
             }
@@ -105,5 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Zorg ervoor dat de superadmin bestaat bij het laden van de pagina, zelfs als er geen login poging is.
     simulatedBackend.getAllUsers();
 });

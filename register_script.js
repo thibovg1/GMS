@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     password: 'adminpassword',
                     role: 'superadmin',
                     email: 'super@admin.com',
-                    status: 'approved' // Superadmin is ALTIJD goedgekeurd
+                    status: 'approved' 
                 };
                 allUsers.push(superAdmin);
                 simulatedBackend.saveAllUsers(allUsers);
@@ -44,10 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         registerUser: (fullName, username, email, password) => {
             return new Promise((resolve, reject) => {
-                setTimeout(() => { // Simuleer netwerkvertraging
+                setTimeout(() => {
                     const allUsers = simulatedBackend.getAllUsers();
                     
-                    // Controleer op unieke gebruikersnaam en e-mail
                     if (allUsers.some(user => user.username === username)) {
                         return reject({ success: false, message: 'Gebruikersnaam bestaat al.' });
                     }
@@ -60,12 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         fullName,
                         username,
                         email,
-                        password, // In een echte app: hashen!
+                        password, 
                         role: 'user', // Standaardrol voor nieuwe registraties
-                        status: 'pending' // Nieuwe accounts moeten goedgekeurd worden door een admin
+                        status: 'pending' // Nieuwe accounts moeten goedgekeurd worden
                     };
                     allUsers.push(newUser);
-                    simulatedBackend.saveAllUsers(allUsers);
+                    simulatedBackend.saveAllUsers(allUsers); // Opslaan na registratie
                     resolve({ success: true, message: 'Registratie succesvol! Wacht op goedkeuring door een beheerder.' });
                 }, 500);
             });
@@ -123,6 +122,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Zorg ervoor dat de superadmin bestaat bij het laden van de pagina
     simulatedBackend.getAllUsers();
 });

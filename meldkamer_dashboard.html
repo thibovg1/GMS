@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meldkamer Systeem - Dashboard</title>
+    <link rel="stylesheet" href="meldkamer_dashboard_style.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <span class="system-title">◎ Meldkamer Systeem 2022 - Made by Xil, Joseph & Nix</span>
+        </div>
+        <div class="header-center">
+            <span class="live-map-title">◎ Livemap</span>
+        </div>
+        <div class="header-right">
+            <button class="settings-button">Instellingen</button>
+            <span class="date-time" id="currentDateTime"></span>
+            <button id="logoutButton" class="logout-button">Uitloggen</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar left-sidebar">
+            <div class="sidebar-section">
+                <div class="section-header">
+                    <h3><span class="icon">⚠</span> Open Meldingen</h3>
+                    <button class="add-button" id="addMeldingButton">+</button>
+                </div>
+                <div class="melding-list" id="openMeldingenList">
+                    <p class="no-meldingen-message">Geen openstaande meldingen</p>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-header">
+                    <h3><span class="icon">✅</span> Uitgevoerde Meldingen</h3>
+                </div>
+                <div class="melding-list" id="completedMeldingenList">
+                    <p class="no-meldingen-message">Geen uitgevoerde meldingen</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2516.666914560738!2d4.47547527692138!3d50.89880856011707!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c3dd82c35582f3%3A0xc3f179c5952c92b!2sHogeschool%20PXL!5e0!3m2!1snl!2sbe!4v1701358327263!5m2!1snl!2sbe" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div class="map-overlay">
+                    <div class="unit-status-display" id="unitStatusDisplay">
+                        <h3>Actieve Eenheden</h3>
+                        <div id="activeUnitsList">
+                            <p>Geen actieve eenheden.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="melding-details-container">
+                <h3><span class="icon">📄</span> Geselecteerde Melding Details</h3>
+                <div id="selectedMeldingDetails">
+                    <p>Geen melding geselecteerd.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="meldkamer_dashboard_script.js"></script>
+</body>
+</html>
