@@ -92,14 +92,19 @@ document.addEventListener('DOMContentLoaded', () => {
             currentSession.currentMeldingen.forEach(melding => {
                 const meldingDiv = document.createElement('div');
                 meldingDiv.className = 'melding-item';
+                // Voorkom dat geaccepteerde/afgewezen meldingen knoppen hebben of verander hun weergave
+                const buttonsHtml = (melding.status === 'Geaccepteerd' || melding.status === 'Afgewezen')
+                    ? `<p class="melding-status-detail">Actie: ${melding.status}</p>`
+                    : `<button class="button acknowledge-button" data-melding-id="${melding.id}">Accepteren</button>
+                       <button class="button reject-button" data-melding-id="${melding.id}">Afwijzen</button>`;
+
                 meldingDiv.innerHTML = `
                     <h3>Melding #${melding.id} - ${melding.type} (${melding.prioriteit})</h3>
                     <p><strong>Locatie:</strong> ${melding.locatie}</p>
                     <p><strong>Omschrijving:</strong> ${melding.omschrijving}</p>
-                    <p class="melding-status">Status: ${melding.status}</p>
+                    <p class="melding-status">Huidige Status: ${melding.status}</p>
                     <p class="melding-timestamp">Ontvangen: ${melding.timestamp}</p>
-                    <button class="button acknowledge-button" data-melding-id="${melding.id}">Accepteren</button>
-                    <button class="button reject-button" data-melding-id="${melding.id}">Afwijzen</button>
+                    ${buttonsHtml}
                 `;
                 incomingMeldingenList.appendChild(meldingDiv);
             });
@@ -113,11 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const meldingId = parseInt(e.target.dataset.meldingId);
         if (e.target.classList.contains('acknowledge-button')) {
             updateMeldingStatusForUnit(meldingId, 'Geaccepteerd', loggedInUser.id);
-            alert(`Melding ${meldingId} geaccepteerd!`);
-            // Hier kun je verder logica toevoegen, zoals navigatie naar een detailpagina
+            alert(`Melding ${meldingId} geaccepteerd! De meldkamer is hiervan op de hoogte gebracht.`);
+            // Hier kun je verder logica toevoegen, zoals navigatie naar een detailpagina of een routeplanner
         } else if (e.target.classList.contains('reject-button')) {
             updateMeldingStatusForUnit(meldingId, 'Afgewezen', loggedInUser.id);
-            alert(`Melding ${meldingId} afgewezen.`);
+            alert(`Melding ${meldingId} afgewezen. De meldkamer is hiervan op de hoogte gebracht.`);
         }
     });
 
@@ -138,28 +143,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 const meldingInSessionIndex = allSessions[targetSessionIndex].currentMeldingen.findIndex(m => m.id === meldingId);
                 if (meldingInSessionIndex !== -1) {
                     allSessions[targetSessionIndex].currentMeldingen[meldingInSessionIndex].status = newStatus;
-                    // Optioneel: verwijder melding als deze afgewezen/afgehandeld is
-                    // allSessions[targetSessionIndex].currentMeldingen.splice(meldingInSessionIndex, 1);
+                    // Optioneel: verwijder melding als deze afgewezen/afgehandeld is,
+                    // afhankelijk van hoe je wilt dat de geschiedenis wordt getoond.
+                    // Voor nu laten we ze staan met de nieuwe status.
                 }
                 sessionStorage.setItem('gms_logged_in_sessions', JSON.stringify(allSessions));
             }
         }
-        renderIncomingMeldingen(); // Ververs de lijst
+        renderIncomingMeldingen(); // Ververs de lijst na de status update
     }
 
 
     backToSelectionButton.addEventListener('click', () => {
         // Maak de afdelingsselectie ongedaan in sessionStorage bij terugkeer
-        loggedInUser.department = undefined;
-        loggedInUser.specialization = undefined;
-        loggedInUser.callsign = undefined;
-        sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+        // zodat de gebruiker opnieuw een afdeling kan kiezen.
+        const userWithoutSelections = {
+            id: loggedInUser.id,
+            username: loggedInUser.username,
+            role: loggedInUser.role 
+            // Verwijder department, specialization, callsign
+        };
+        sessionStorage.setItem('loggedInUser', JSON.stringify(userWithoutSelections));
 
-        // Verwijder de huidige meldingen voor deze sessie bij terugkeer naar selectiepagina
+        // Verwijder de huidige meldingen voor deze specifieke sessie bij terugkeer naar selectiepagina
+        // Dit voorkomt dat meldingen blijven staan als de gebruiker van afdeling wisselt.
         let allSessions = JSON.parse(sessionStorage.getItem('gms_logged_in_sessions')) || [];
         const currentSessionIndex = allSessions.findIndex(session => session.id === loggedInUser.id);
         if (currentSessionIndex !== -1) {
-            allSessions[currentSessionIndex].currentMeldingen = []; // Leeg de meldingen
+            allSessions[currentSessionIndex].department = undefined; // Wis department etc. in de actieve sessie
+            allSessions[currentSessionIndex].specialization = undefined;
+            allSessions[currentSessionIndex].callsign = undefined;
+            allSessions[currentSessionIndex].currentMeldingen = []; // Leeg de meldingen voor deze sessie
             sessionStorage.setItem('gms_logged_in_sessions', JSON.stringify(allSessions));
         }
 
@@ -169,7 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render de meldingen direct bij het laden van de pagina
     renderIncomingMeldingen();
 
-    // Optioneel: Ververs meldingen periodiek (bijv. elke 10 seconden)
-    // Dit simuleert een 'live' update, in een echte app zou je WebSockets gebruiken.
-    // setInterval(renderIncomingMeldingen, 10000); 
+    // Optioneel: Ververs meldingen periodiek (bijv. elke 5 seconden)
+    // Dit simuleert een 'live' update. In een echte app zou je WebSockets gebruiken
+    // voor directe, efficiënte updates.
+    setInterval(renderIncomingMeldingen, 5000); 
 });
