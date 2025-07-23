@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Admin Dashboard Script: DOMContentLoaded - Start.");
+    console.log("Admin Dashboard Script: DOMContentLoaded - Start."); // Diagnostische log
 
     // --- DOM Element Selectors ---
     const adminUsernameDisplay = document.getElementById('adminUsernameDisplay');
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userFilterStatus = document.getElementById('userFilterStatus');
 
     // Admin Management section
-    const adminManagementSection = document.getElementById('admin-management'); // De hele sectie
+    const adminManagementSection = document.getElementById('admin-management'); 
     const adminTableBody = document.getElementById('adminTableBody');
     const noAdminsMessage = document.getElementById('noAdminsMessage');
     const addAdminButton = document.getElementById('addAdminButton');
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Global State / Logged In Admin ---
     let loggedInAdmin = JSON.parse(sessionStorage.getItem('loggedInAdmin'));
-    console.log("Admin Dashboard Script: Initial loggedInAdmin:", loggedInAdmin);
+    console.log("Admin Dashboard Script: Initial loggedInAdmin:", loggedInAdmin); // Diagnostische log
 
     // --- Constants ---
     const SUPERADMIN_USERNAME = 'superadmin';
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkAdminAccess() {
         if (!loggedInAdmin || (loggedInAdmin.role !== 'admin' && loggedInAdmin.role !== 'superadmin')) {
             alert('Geen toegang: U bent niet geautoriseerd om dit dashboard te bekijken.');
-            console.warn("Access Denied: Not a valid admin role or not logged in.");
+            console.warn("Access Denied: Not a valid admin role or not logged in. Redirecting.");
             window.location.href = 'admin_login.html'; // Redirect to admin login page
             return false;
         }
@@ -126,10 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!superAdminExists) {
                 console.warn(`Superadmin '${SUPERADMIN_USERNAME}' not found in localStorage by dashboard, creating...`);
                 const superAdmin = {
-                    id: 'superadmin_id_fixed', // Fixed ID for consistency
+                    id: 'superadmin_id_fixed', 
                     fullName: 'Global Super Admin',
                     username: SUPERADMIN_USERNAME,
-                    password: SUPERADMIN_PASSWORD,
+                    password: SUPERADMIN_PASSWORD, 
                     role: 'superadmin',
                     email: 'superadmin@global.com',
                     status: 'approved'
@@ -228,14 +228,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Special checks for admin deletion
             if (userToDelete.role === 'superadmin') {
-                const allSuperAdmins = users.filter(u => u.role === 'superadmin');
-                if (allSuperAdmins.length === 1 && userToDelete.id === loggedInAdmin.id) { // Prevent deleting the ONLY superadmin if it's yourself
+                const allSuperAdmins = users.filter(a => a.role === 'superadmin');
+                if (allSuperAdmins.length === 1 && userToDelete.id === loggedInAdmin.id) { 
                      return { success: false, message: 'U kunt uw eigen, enige superadmin-account niet verwijderen.' };
-                } else if (allSuperAdmins.length === 1) { // Prevent deleting the last superadmin by anyone
+                } else if (allSuperAdmins.length === 1) { 
                     return { success: false, message: 'Kan de enige superadmin niet verwijderen.' };
                 }
             }
-            if (userToDelete.id === loggedInAdmin.id) { // Prevent deleting self
+            if (userToDelete.id === loggedInAdmin.id) { 
                 return { success: false, message: 'U kunt uw eigen account niet verwijderen via dit dashboard.' };
             }
 
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fullName,
                 username,
                 email,
-                password, // For simulation only!
+                password, 
                 role: role,
                 status: 'approved'
             };
@@ -276,7 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Rendering Functions ---
 
-    // Render Dashboard Overview
     function renderOverview() {
         console.log("Rendering Dashboard Overview.");
         const allUsers = simulatedBackend.getAllUsers();
@@ -284,17 +283,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const allMeldingen = simulatedBackend.getAllMeldingen();
         const openMeldingen = allMeldingen.filter(m => m.status !== 'Afgehandeld' && m.status !== 'Gearchiveerd');
         const activeSessions = simulatedBackend.getAllSessions();
-        // Filter out Meldkamer/Burger from 'active units' for the stat
         const activeUnits = activeSessions.filter(s => s.department && s.unitStatus && s.department !== 'Meldkamer' && s.department !== 'Burger');
 
         if (totalUsersCount) totalUsersCount.textContent = regularUsers.length;
         if (openMeldingenCount) openMeldingenCount.textContent = openMeldingen.length;
         if (activeUnitsCount) activeUnitsCount.textContent = activeUnits.length;
 
-        // Render Recent Logs
         if (recentLogsList) {
             recentLogsList.innerHTML = '';
-            const logs = simulatedBackend.getLogs().slice().reverse().slice(0, 5); // Get 5 most recent
+            const logs = simulatedBackend.getLogs().slice().reverse().slice(0, 5); 
             if (logs.length === 0) {
                 recentLogsList.innerHTML = '<li>Geen recente activiteiten.</li>';
             } else {
@@ -306,13 +303,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Render Unit Status Overview
         if (unitStatusOverview) {
             unitStatusOverview.innerHTML = '';
             if (activeUnits.length === 0) {
                 unitStatusOverview.innerHTML = '<li>Geen actieve eenheden.</li>';
             } else {
-                const statusCounts = {}; // { 'Statusnaam': aantal }
+                const statusCounts = {}; 
                 activeUnits.forEach(unit => {
                     statusCounts[unit.unitStatus] = (statusCounts[unit.unitStatus] || 0) + 1;
                 });
@@ -326,7 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Render User Management Table
     function renderUserTable() {
         console.log("Rendering User Table.");
         userTableBody.innerHTML = '';
@@ -367,7 +362,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const actionCell = row.insertCell();
             actionCell.className = 'action-buttons';
 
-            // Only Superadmin or Admin can manage users
             if (loggedInAdmin.role === 'superadmin' || loggedInAdmin.role === 'admin') {
                 if (user.status === 'pending') {
                     const approveButton = document.createElement('button');
@@ -397,7 +391,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Render Admin Management Table
     function renderAdminTable() {
         console.log("Rendering Admin Table.");
         adminTableBody.innerHTML = '';
@@ -423,14 +416,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (loggedInAdmin.role === 'superadmin') {
                 const allSuperAdmins = admins.filter(a => a.role === 'superadmin');
-                // Allow delete if not self and not the only superadmin
                 const canDelete = admin.id !== loggedInAdmin.id && !(admin.role === 'superadmin' && allSuperAdmins.length === 1);
 
                 if (canDelete) {
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'Verwijderen';
                     deleteButton.className = 'delete-button';
-                    deleteButton.onclick = () => handleUserAction(admin.id, 'delete'); // Use generic deleteUser
+                    deleteButton.onclick = () => handleUserAction(admin.id, 'delete'); 
                     actionCell.appendChild(deleteButton);
                 } else {
                     const span = document.createElement('span');
@@ -451,7 +443,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Render Log Viewer Table
     function renderLogTable() {
         console.log("Rendering Log Table.");
         logTableBody.innerHTML = '';
@@ -464,7 +455,6 @@ document.addEventListener('DOMContentLoaded', () => {
             noLogsMessage.style.display = 'none';
         }
 
-        // Display most recent logs first
         logs.slice().reverse().forEach(log => {
             const row = logTableBody.insertRow();
             row.insertCell().textContent = log.timestamp;
@@ -474,7 +464,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Handlers ---
 
-    // Handle user actions (approve, reject, delete)
     async function handleUserAction(userId, actionType) {
         console.log(`Attempting action: ${actionType} for user ID: ${userId}`);
         if (!confirm(`Weet je zeker dat je deze actie wilt uitvoeren? (${actionType})`)) {
@@ -497,7 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response && response.success) {
                 alert(response.message);
-                updateAllRenderings(); // Re-render all relevant sections
+                updateAllRenderings(); 
             } else {
                 alert(response.message || 'Actie mislukt.');
             }
@@ -507,20 +496,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Navigation click handler
     navItems.forEach(item => {
         item.addEventListener('click', () => {
-            // Remove 'active' from all nav items and sections
             navItems.forEach(nav => nav.classList.remove('active'));
             dashboardSections.forEach(section => section.classList.remove('active'));
 
-            // Add 'active' to clicked nav item and corresponding section
             item.classList.add('active');
             const targetSectionId = item.dataset.section;
             const targetSection = document.getElementById(targetSectionId);
             if (targetSection) {
                 targetSection.classList.add('active');
-                // Re-render specific section content when navigated to it
                 switch (targetSectionId) {
                     case 'overview':
                         renderOverview();
@@ -540,34 +525,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Logout
     logoutLink.addEventListener('click', (e) => {
         e.preventDefault();
         sessionStorage.removeItem('loggedInAdmin');
         console.log("Logged out. Redirecting to admin_login.html.");
         alert('U bent succesvol uitgelogd als beheerder.');
-        window.location.href = 'admin_login.html'; // Or index.html
+        window.location.href = 'admin_login.html'; 
     });
 
-    // Add Admin Button (opens modal)
     addAdminButton.addEventListener('click', () => {
         if (loggedInAdmin.role === 'superadmin') {
-            addAdminModal.style.display = 'flex'; // Show modal
-            hideMessage(addAdminMessage); // Clear previous messages
-            addAdminForm.reset(); // Reset form
+            addAdminModal.style.display = 'flex'; 
+            hideMessage(addAdminMessage); 
+            addAdminForm.reset(); 
             console.log("Add Admin modal opened.");
         } else {
             alert('U heeft geen rechten om nieuwe admins toe te voegen.');
         }
     });
 
-    // Close Add Admin Modal (X button)
     closeAddAdminModalButton.addEventListener('click', () => {
         addAdminModal.style.display = 'none';
         console.log("Add Admin modal closed by button.");
     });
 
-    // Close Add Admin Modal (click outside)
     window.addEventListener('click', (event) => {
         if (event.target === addAdminModal) {
             addAdminModal.style.display = 'none';
@@ -575,7 +556,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle Add Admin Form Submission
     addAdminForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         hideMessage(addAdminMessage);
@@ -600,8 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await simulatedBackend.addNewAdmin(fullName, username, email, password, role);
             displayMessage(addAdminMessage, response.message, 'success');
             addAdminForm.reset();
-            updateAllRenderings(); // Update tables after adding new admin
-            // Optional: Close modal after successful addition
+            updateAllRenderings(); 
             setTimeout(() => addAdminModal.style.display = 'none', 1500);
         } catch (error) {
             displayMessage(addAdminMessage, error.message || 'Fout bij toevoegen admin.', 'error');
@@ -609,7 +588,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // User table search and filter
     if (userSearchInput) {
         userSearchInput.addEventListener('keyup', renderUserTable);
     }
@@ -620,20 +598,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initial Load & Periodic Updates ---
     function updateAllRenderings() {
         renderOverview();
-        renderUserTable(); // Render all tables/sections
+        renderUserTable(); 
         renderAdminTable();
         renderLogTable();
     }
 
-    // Call initial rendering functions
     updateAllRenderings();
 
-    // Set up periodic refresh for dashboard stats and logs
-    // (Simulates live updates without a real backend)
-    setInterval(renderOverview, 10000); // Update overview every 10 seconds
-    setInterval(renderLogTable, 5000); // Update logs every 5 seconds
-    setInterval(renderUserTable, 15000); // Periodically refresh user table
-    setInterval(renderAdminTable, 15000); // Periodically refresh admin table
+    setInterval(renderOverview, 10000); 
+    setInterval(renderLogTable, 5000); 
+    setInterval(renderUserTable, 15000); 
+    setInterval(renderAdminTable, 15000); 
 
-    console.log("Admin Dashboard Script: Initialization Complete.");
+    console.log("Admin Dashboard Script: Initialization Complete."); 
 });

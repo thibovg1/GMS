@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Admin Login Script: DOMContentLoaded - Start."); // Diagnostische log
+
     const loginForm = document.getElementById('loginForm');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
@@ -6,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Constants for Superadmin (MUST match admin_dashboard_script.js)
     const SUPERADMIN_USERNAME = 'superadmin';
-    const SUPERADMIN_PASSWORD = 'adminpassword'; // Your Superadmin Password
+    const SUPERADMIN_PASSWORD = 'adminpassword'; 
 
     // Local Storage Key for Users
     const LOCAL_STORAGE_USERS_KEY = 'gms_all_users';
@@ -31,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const superAdmin = {
                 id: 'superadmin_id_fixed', // Fixed ID for consistency
                 fullName: 'Global Super Admin',
-                username: "superadmin",
-                password: "adminpassword",
+                username: SUPERADMIN_USERNAME,
+                password: SUPERADMIN_PASSWORD, // Ongehasht wachtwoord voor simulatie
                 role: 'superadmin',
                 email: 'superadmin@global.com',
                 status: 'approved'
@@ -60,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         errorMessage.textContent = ''; // Clear previous errors
+        errorMessage.style.display = 'none'; // Verberg de foutmelding
 
         const username = usernameInput.value.trim();
         const password = passwordInput.value;
@@ -67,13 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Directly check for Superadmin login (hardcoded for initial access)
         if (username === SUPERADMIN_USERNAME && password === SUPERADMIN_PASSWORD) {
             const adminUser = {
-                id: 'superadmin_id_fixed', // Use fixed ID
-                username: "superadmin",
+                id: 'superadmin_id_fixed', 
+                username: SUPERADMIN_USERNAME,
                 role: 'superadmin',
                 fullName: 'Global Super Admin'
             };
             sessionStorage.setItem('loggedInAdmin', JSON.stringify(adminUser));
-            console.log('Superadmin login successful.');
+            console.log('Superadmin login successful. Redirecting to admin_dashboard.html');
             window.location.href = 'admin_dashboard.html';
             return;
         }
@@ -92,14 +95,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.href = 'admin_dashboard.html';
                 } else if (foundUser.status === 'pending') {
                     errorMessage.textContent = 'Uw account wacht op goedkeuring.';
+                    errorMessage.style.display = 'block';
                 } else { // rejected
                     errorMessage.textContent = 'Uw account is afgewezen.';
+                    errorMessage.style.display = 'block';
                 }
             } else {
                 errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord voor admin toegang.';
+                errorMessage.style.display = 'block';
             }
         } else {
             errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord.';
+            errorMessage.style.display = 'block';
         }
     });
 });
