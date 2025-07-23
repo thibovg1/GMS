@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Pagina</title>
-    <link rel="stylesheet" href="index_style.css"> </head>
+    <link rel="stylesheet" href="index_style.css">
+</head>
 <body>
     <div class="login-container">
         <h1>Inloggen</h1>
+        
         <form id="loginForm">
             <div class="input-group">
                 <label for="username">Gebruikersnaam:</label>
@@ -19,9 +21,11 @@
             </div>
             <button type="submit" class="login-button">Log In</button>
         </form>
+
         <p id="loginMessage" class="message" style="display:none;"></p>
         <p class="register-link">Nog geen account? <a href="register.html">Registreer hier</a></p>
-        <p class="welcome-link"><a href="index.html">Terug naar Welkomstpagina</a></p>
+        <p class="welcome-link"><a href="admin_login.html">Terug naar Welkomstpagina</a></p>
     </div>
-    </body>
+    <script src="index_script.js"></script>
+</body>
 </html>

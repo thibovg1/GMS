@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const maintenanceModeInput = document.getElementById('maintenance_mode');
     const settingsMessage = document.getElementById('settingsMessage');
 
+    const logoutLink = document.getElementById('logoutLink');
+
     // Constanten
     const ADMIN_TOKEN = 'your_super_secret_admin_token'; // Simulatie van een token
 
@@ -27,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Gesimuleerde Backend met localStorage ---
     const simulatedBackend = {
-        // --- Algemene Gebruikers (spelers + admins) opslag ---
+        // --- Algemene Gebruikers (user + mod + admin + superadmin) opslag ---
         getAllUsers: () => {
             const storedAllUsers = localStorage.getItem('gms_all_users');
             let allUsers = [];
@@ -44,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     fullName: 'Super Admin',
                     username: 'superadmin',
                     password: 'adminpassword',
-                    role: 'superadmin', // Superadmin blijft superadmin
+                    role: 'superadmin',
                     email: 'super@admin.com',
                     status: 'approved'
                 };
@@ -58,24 +60,27 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('gms_all_users', JSON.stringify(users));
         },
 
-        // --- Reguliere Gebruikers (Spelers & Mods) ---
+        // --- Reguliere Gebruikers (alleen users) ---
         getUsers: () => {
-            // Filter en retourneer alle gebruikers die geen 'superadmin' zijn
-            // Dit zijn nu spelers en mods
-            return simulatedBackend.getAllUsers().filter(user => user.role !== 'superadmin');
+            return simulatedBackend.getAllUsers().filter(user => user.role === 'user');
         },
         updateUserStatus: (userId, newStatus, token) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     if (token !== ADMIN_TOKEN) { return reject({ success: false, message: 'Ongeautoriseerde toegang.' }); }
-                    // Alleen superadmin mag user status wijzigen via console
-                    if (loggedInAdmin.role !== 'superadmin') {
-                        return reject({ success: false, message: 'Alleen een superadmin kan de status van gebruikers wijzigen.' });
+                    
+                    // Alleen superadmin of admin mag user status wijzigen
+                    if (loggedInAdmin.role !== 'superadmin' && loggedInAdmin.role !== 'admin') {
+                        return reject({ success: false, message: 'Alleen een superadmin of admin kan de status van gebruikers wijzigen.' });
                     }
 
                     let allUsers = simulatedBackend.getAllUsers();
                     const userIndex = allUsers.findIndex(u => u.id === userId);
                     if (userIndex > -1) {
+                        // Zorg ervoor dat de user die je probeert te wijzigen ook daadwerkelijk een 'user' is
+                        if (allUsers[userIndex].role !== 'user') {
+                            return reject({ success: false, message: 'Kan geen status wijzigen van niet-gebruikersrollen via dit paneel.' });
+                        }
                         allUsers[userIndex].status = newStatus;
                         simulatedBackend.saveAllUsers(allUsers);
                         logAdminAction(`Gebruiker ${allUsers[userIndex].username} status gewijzigd naar ${newStatus}`);
@@ -87,16 +92,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        // --- Admin Beheer (alleen superadmin kan toevoegen, rollen via console) ---
+        // --- Admin Beheer (admin, mod, superadmin) ---
         getAdmins: () => {
-            // Retourneert alle admins, inclusief superadmin en mods
             return simulatedBackend.getAllUsers().filter(user => user.role === 'admin' || user.role === 'superadmin' || user.role === 'mod');
         },
         addAdmin: (username, password, token) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     if (token !== ADMIN_TOKEN) { return reject({ success: false, message: 'Ongeautoriseerde toegang.' }); }
-                    // Alleen superadmin mag nieuwe admins toevoegen via UI
+                    
                     if (loggedInAdmin.role !== 'superadmin') {
                         return reject({ success: false, message: 'Alleen een superadmin kan nieuwe admins toevoegen.' });
                     }
@@ -122,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 300);
             });
         },
-        // Deze functie blijft bestaan voor console-gebruik
         updateAdminRole: (userId, newRole, token) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
@@ -140,14 +143,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (loggedInAdmin.id === targetUser.id && targetUser.role === 'superadmin' && newRole !== 'superadmin') {
                              return reject({ success: false, message: 'De superadmin kan zijn eigen rol niet wijzigen.' });
                         }
-                        // Alleen superadmin kan andere admins de superadmin rol geven
-                        if (newRole === 'superadmin' && loggedInAdmin.role !== 'superadmin') {
-                             return reject({ success: false, message: 'Alleen een superadmin kan een andere gebruiker de superadmin rol geven.' });
+                        // Controleer of de nieuwe rol geldig is
+                        const validRoles = ['user', 'mod', 'admin', 'superadmin'];
+                        if (!validRoles.includes(newRole)) {
+                            return reject({ success: false, message: 'Ongeldige rol opgegeven. Kies uit: user, mod, admin, superadmin.' });
                         }
-
+                        // Voorkom het toewijzen van 'user' rol aan bestaande admins/superadmins via de console, tenzij het oorspronkelijk een user was.
+                        // We laten het hier flexibel, de superadmin weet wat hij doet.
+                        
+                        // Log speciale actie voor rolwijziging
+                        logAdminAction(`Gebruiker ${targetUser.username} rol gewijzigd van ${targetUser.role} naar ${newRole}`);
                         targetUser.role = newRole;
                         simulatedBackend.saveAllUsers(allUsers);
-                        logAdminAction(`Gebruiker ${targetUser.username} rol gewijzigd naar ${newRole}`);
                         resolve({ success: true, message: 'Rol succesvol bijgewerkt.' });
                     } else {
                         reject({ success: false, message: 'Gebruiker niet gevonden.' });
@@ -159,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     if (token !== ADMIN_TOKEN) { return reject({ success: false, message: 'Ongeautoriseerde toegang.' }); }
-                    // Alleen superadmin mag admins verwijderen
+                    
                     if (loggedInAdmin.role !== 'superadmin') {
                         return reject({ success: false, message: 'Alleen een superadmin kan admins verwijderen.' });
                     }
@@ -170,11 +177,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (!adminToDelete) { return reject({ success: false, message: 'Admin niet gevonden.' }); }
 
-                    // Voorkom verwijderen van de 'superadmin' rol
                     if (adminToDelete.role === 'superadmin') {
                         return reject({ success: false, message: 'De "superadmin" kan niet worden verwijderd.' });
                     }
-                    // Voorkom dat je de ingelogde admin verwijdert
                     if (loggedInAdmin && adminToDelete.id === loggedInAdmin.id) {
                         return reject({ success: false, message: 'Je kunt jezelf niet verwijderen.' });
                     }
@@ -201,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     if (token !== ADMIN_TOKEN) { return reject({ success: false, message: 'Ongeautoriseerde toegang.' }); }
-                    // Alleen superadmin mag logs leegmaken
+                    
                     if (loggedInAdmin.role !== 'superadmin') {
                         return reject({ success: false, message: 'Alleen een superadmin kan de logboeken leegmaken.' });
                     }
@@ -221,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     if (token !== ADMIN_TOKEN) { return reject({ success: false, message: 'Ongeautoriseerde toegang.' }); }
-                    // Alleen superadmin mag instellingen opslaan
+                    
                     if (loggedInAdmin.role !== 'superadmin') {
                         return reject({ success: false, message: 'Alleen een superadmin kan instellingen opslaan.' });
                     }
@@ -233,22 +238,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- Bepaal de 'ingelogde' admin. Dit is nu altijd de superadmin voor console acties ---
-    // Deze functie wordt direct aangeroepen om de superadmin te vinden en in te stellen.
-    const getInitialLoggedInAdmin = () => {
-        const allUsers = simulatedBackend.getAllUsers();
-        return allUsers.find(user => user.username === 'superadmin' && user.role === 'superadmin');
-    };
-    const loggedInAdmin = getInitialLoggedInAdmin(); // loggedInAdmin is nu altijd de superadmin
+    // --- Bepaal de 'ingelogde' admin. Haal uit sessionStorage! ---
+    const loggedInAdmin = JSON.parse(sessionStorage.getItem('loggedInUser'));
+
+    // Toegangscontrole: Stuur terug als de rol niet voldoende is (alleen mod, admin, superadmin)
+    if (!loggedInAdmin || !['mod', 'admin', 'superadmin'].includes(loggedInAdmin.role)) {
+        alert('U heeft geen toegang tot dit dashboard. Log in met een bevoegde rol.');
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    const consoleAdmin = simulatedBackend.getAllUsers().find(user => user.username === 'superadmin' && user.role === 'superadmin');
+
 
     // Functie om berichten weer te geven (generiek)
     function showMessage(message, type, element) {
         element.textContent = message;
-        element.className = `explanation-note ${type}`; // Gebruik de basisklasse + type
+        element.className = `explanation-note ${type}`;
         element.style.display = 'block';
         setTimeout(() => {
             element.style.display = 'none';
-        }, 5000); // Verberg bericht na 5 seconden
+        }, 5000);
     }
 
     // --- Logboek Functionaliteit ---
@@ -260,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const timestamp = new Date().toLocaleString('nl-NL');
         const logEntry = {
             timestamp: timestamp,
-            admin: loggedInAdmin.username,
+            admin: loggedInAdmin.username, 
             action: action
         };
         simulatedBackend.addLog(logEntry);
@@ -281,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event listener voor logboeken leegmaken
     if (clearLogsButton) {
         clearLogsButton.addEventListener('click', async () => {
             if (loggedInAdmin.role !== 'superadmin') {
@@ -312,7 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
         maxUsersInput.value = settings.maxUsers;
         maintenanceModeInput.checked = settings.maintenanceMode;
 
-        // Schakel instellingenformulieren uit als de "ingelogde" gebruiker geen superadmin is
         const inputs = settingsForm.querySelectorAll('input, button');
         inputs.forEach(input => {
             if (loggedInAdmin.role !== 'superadmin') {
@@ -322,7 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Toon een melding als niet-superadmin
         if (loggedInAdmin.role !== 'superadmin') {
             showMessage("Alleen een superadmin kan deze instellingen wijzigen.", "warning", settingsMessage);
         } else {
@@ -330,7 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event listener voor instellingen formulier
     if (settingsForm) {
         settingsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -361,17 +367,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-    // --- Gebruikersbeheer (Spelers & Mods) Functionaliteit ---
+    // --- Gebruikersbeheer (Users) Functionaliteit ---
     function renderUsers() {
         userTableBody.innerHTML = '';
-        const allUsersForDisplay = simulatedBackend.getUsers(); // Haal nu alle spelers en mods op
+        const users = simulatedBackend.getUsers().filter(user => user.role === 'user'); 
 
-        // Aangezien alle nieuwe gebruikers 'mod' en 'approved' zijn, filteren we alleen 'rejected'
-        const activeUsers = allUsersForDisplay.filter(user => user.status !== 'rejected');
+        const activeUsers = users.filter(user => user.status !== 'rejected');
 
         if (activeUsers.length === 0) {
-            userTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: #777;">Geen spelersaccounts gevonden.</td></tr>`;
+            userTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: #777;">Geen gebruikersaccounts gevonden.</td></tr>`;
         }
 
         activeUsers.forEach(user => {
@@ -381,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
             row.insertCell().textContent = user.fullName;
             row.insertCell().textContent = user.username;
             row.insertCell().textContent = user.email;
-            row.insertCell().textContent = user.role || 'player'; // Toon de rol, standaard 'player' als leeg
+            row.insertCell().textContent = user.role;
 
             const statusCell = row.insertCell();
             let statusText = '';
@@ -396,24 +400,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const actionsCell = row.insertCell();
             
-            // Goedkeuren knop (alleen als niet al goedgekeurd)
-            if (user.status !== 'approved') {
+            if (user.status !== 'approved' && (loggedInAdmin.role === 'superadmin' || loggedInAdmin.role === 'admin')) {
                 const approveButton = document.createElement('button');
                 approveButton.textContent = 'Goedkeuren';
                 approveButton.className = 'action-button approve-button';
                 approveButton.addEventListener('click', () => handleUserAction(user.id, 'approved', user.fullName));
                 actionsCell.appendChild(approveButton);
+            } else if (user.status !== 'approved' && loggedInAdmin.role === 'mod') {
+                actionsCell.textContent = 'Geen acties via UI';
             }
 
-            // Afkeuren knop
-            const rejectButton = document.createElement('button');
-            rejectButton.textContent = 'Afkeuren';
-            rejectButton.className = 'action-button reject-button';
-            rejectButton.addEventListener('click', () => handleUserAction(user.id, 'rejected', user.fullName));
-            actionsCell.appendChild(rejectButton);
-
-            // Intrekken knop (als goedgekeurd)
-            if (user.status === 'approved') {
+            if (loggedInAdmin.role === 'superadmin' || loggedInAdmin.role === 'admin') {
+                const rejectButton = document.createElement('button');
+                rejectButton.textContent = 'Afkeuren';
+                rejectButton.className = 'action-button reject-button';
+                rejectButton.addEventListener('click', () => handleUserAction(user.id, 'rejected', user.fullName));
+                actionsCell.appendChild(rejectButton);
+            }
+            
+            if (user.status === 'approved' && (loggedInAdmin.role === 'superadmin' || loggedInAdmin.role === 'admin')) {
                 const revokeButton = document.createElement('button');
                 revokeButton.textContent = 'Intrekken';
                 revokeButton.className = 'action-button revoke-button';
@@ -424,9 +429,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleUserAction(userId, newStatus, userName) {
-        // De acties Goedkeuren/Afkeuren/Intrekken zijn nu alleen beschikbaar voor de superadmin
-        if (loggedInAdmin.role !== 'superadmin') {
-            showMessage("Alleen een superadmin kan gebruikersstatussen wijzigen.", "error", adminMessage);
+        if (loggedInAdmin.role !== 'superadmin' && loggedInAdmin.role !== 'admin') {
+            showMessage("Alleen een superadmin of admin kan gebruikersstatussen wijzigen.", "error", adminMessage);
             return;
         }
 
@@ -452,10 +456,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Admin Beheer Functionaliteit ---
+    // --- Admin Beheer Functionaliteit (Superadmin, Admin, Mod) ---
     function renderAdmins() {
         adminTableBody.innerHTML = '';
-        const admins = simulatedBackend.getAdmins();
+        const admins = simulatedBackend.getAllUsers().filter(user => user.role !== 'user');
 
         if (admins.length === 0) {
             adminTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #777;">Geen admins gevonden.</td></tr>`;
@@ -466,13 +470,11 @@ document.addEventListener('DOMContentLoaded', () => {
             row.dataset.userId = admin.id;
 
             row.insertCell().textContent = admin.username;
-            row.insertCell().textContent = '******'; // Wachtwoord niet tonen
+            row.insertCell().textContent = '******';
             row.insertCell().textContent = admin.role;
 
             const actionsCell = row.insertCell();
 
-            // Verwijder UI-elementen voor rolwijziging. Dit gebeurt nu via console.
-            // Verwijder UI-elementen voor verwijderen, behalve voor superadmin die andere mods/admins mag verwijderen
             if (admin.role !== 'superadmin' && loggedInAdmin.role === 'superadmin') {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Verwijderen';
@@ -480,11 +482,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 deleteButton.addEventListener('click', () => handleDeleteAdmin(admin.id, admin.username));
                 actionsCell.appendChild(deleteButton);
             } else if (admin.role === 'superadmin') {
-                actionsCell.textContent = 'Niet bewerkbaar via UI'; // Superadmin niet verwijderbaar/rol wijzigbaar via UI
-            } else {
-                actionsCell.textContent = 'Geen acties via UI'; // Mods/admins kunnen zichzelf niet bewerken via UI
+                actionsCell.textContent = 'Niet bewerkbaar via UI';
+            } else if (loggedInAdmin.role !== 'superadmin') {
+                actionsCell.textContent = 'Geen acties via UI';
             }
         });
+        if (loggedInAdmin.role !== 'superadmin' && adminPasswordHeader) {
+            adminPasswordHeader.style.display = 'none';
+        } else if (adminPasswordHeader) {
+            adminPasswordHeader.style.display = 'table-cell';
+        }
     }
 
     async function handleAddAdmin(username, password) {
@@ -527,8 +534,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     showMessage(response.message, 'error', adminMessage);
                 }
             } catch (error) {
-                showMessage(`Fout bij verwijderen admin: ${error.message || 'Onbekende fout'}`, 'error', adminMessage);
-                console.error('Fout bij verwijderen admin:', error);
+                    showMessage(`Fout bij verwijderen admin: ${error.message || 'Onbekende fout'}`, 'error', adminMessage);
+                    console.error('Fout bij verwijderen admin:', error);
             }
         }
     }
@@ -543,6 +550,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (logoutLink) {
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html';
+        });
+    }
+
     // Initial render calls
     renderUsers();
     renderAdmins();
@@ -550,39 +565,61 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSettings();
 
     // Publieke interface voor console commando's
-    // Dit maakt het mogelijk om functies aan te roepen via de browser console voor debuggen en beheer
     window.gmsAdmin = {
         updateUserStatus: (userId, newStatus) => {
-            // Roep de interne functie aan met de 'superadmin' token
+            if (!consoleAdmin || consoleAdmin.role !== 'superadmin') {
+                console.error("Alleen een superadmin kan deze actie via de console uitvoeren.");
+                return Promise.reject({ success: false, message: 'Ongeautoriseerde actie.' });
+            }
             return simulatedBackend.updateUserStatus(userId, newStatus, ADMIN_TOKEN)
                 .then(response => { console.log(response.message); renderUsers(); return response; })
                 .catch(error => { console.error('Console update user status failed:', error.message); return { success: false, message: error.message }; });
         },
-        updateAdminRole: (userId, newRole) => {
-            // Roep de interne functie aan met de 'superadmin' token
-            return simulatedBackend.updateAdminRole(userId, newRole, ADMIN_TOKEN)
-                .then(response => { console.log(response.message); renderAdmins(); return response; })
-                .catch(error => { console.error('Console update admin role failed:', error.message); return { success: false, message: error.message }; });
+        // FUNCTIE VOOR HET WIJZIGEN VAN ROLLEN VIA CONSOLE
+        updateUserRole: (userId, newRole) => {
+            if (!consoleAdmin || consoleAdmin.role !== 'superadmin') {
+                console.error("Alleen een superadmin kan de rol van gebruikers wijzigen via de console.");
+                return Promise.reject({ success: false, message: 'Ongeautoriseerde actie.' });
+            }
+            return simulatedBackend.updateAdminRole(userId, newRole, ADMIN_TOKEN) // Hergebruik van updateAdminRole, maar nu voor alle rollen
+                .then(response => { 
+                    console.log(response.message); 
+                    renderUsers(); // Zorg dat gebruikers en admins opnieuw worden gerenderd
+                    renderAdmins(); 
+                    return response; 
+                })
+                .catch(error => { 
+                    console.error('Console update user role failed:', error.message); 
+                    return { success: false, message: error.message }; 
+                });
         },
         deleteAdmin: (userId) => {
-            // Roep de interne functie aan met de 'superadmin' token
+            if (!consoleAdmin || consoleAdmin.role !== 'superadmin') {
+                console.error("Alleen een superadmin kan deze actie via de console uitvoeren.");
+                return Promise.reject({ success: false, message: 'Ongeautoriseerde actie.' });
+            }
             return simulatedBackend.deleteAdmin(userId, ADMIN_TOKEN)
                 .then(response => { console.log(response.message); renderAdmins(); return response; })
                 .catch(error => { console.error('Console delete admin failed:', error.message); return { success: false, message: error.message }; });
         },
         saveSettings: (settings) => {
-            // Roep de interne functie aan met de 'superadmin' token
+            if (!consoleAdmin || consoleAdmin.role !== 'superadmin') {
+                console.error("Alleen een superadmin kan deze actie via de console uitvoeren.");
+                return Promise.reject({ success: false, message: 'Ongeautoriseerde actie.' });
+            }
             return simulatedBackend.saveSettings(settings, ADMIN_TOKEN)
                 .then(response => { console.log(response.message); renderSettings(); return response; })
                 .catch(error => { console.error('Console save settings failed:', error.message); return { success: false, message: error.message }; });
         },
         clearLogs: () => {
-             // Roep de interne functie aan met de 'superadmin' token
+            if (!consoleAdmin || consoleAdmin.role !== 'superadmin') {
+                console.error("Alleen een superadmin kan deze actie via de console uitvoeren.");
+                return Promise.reject({ success: false, message: 'Ongeautoriseerde actie.' });
+            }
              return simulatedBackend.clearLogs(ADMIN_TOKEN)
                 .then(response => { console.log(response.message); renderLogs(); return response; })
                 .catch(error => { console.error('Console clear logs failed:', error.message); return { success: false, message: error.message }; });
         },
-        // Toegang tot de getAllUsers functie voor inspectie
         getAllUsers: () => {
             return simulatedBackend.getAllUsers();
         }

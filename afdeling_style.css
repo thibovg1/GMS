@@ -8,31 +8,36 @@ body {
     margin: 0;
     padding: 0;
 
-    background-image: url('image.png');
+    background-image: url('image.png'); /* Pad naar je achtergrondafbeelding */
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
 
-.register-container {
+.selection-container {
     background-color: #ffffff;
     padding: 40px;
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(0,0,0,0.1);
     width: 100%;
-    max-width: 450px;
+    max-width: 500px;
     text-align: center;
 }
 
-.register-container h1 {
+.selection-container h1 {
     color: #34495e;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     font-size: 2em;
 }
 
+.selection-container p {
+    margin-bottom: 25px;
+    color: #555;
+}
+
 .input-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     text-align: left;
 }
 
@@ -43,17 +48,22 @@ body {
     font-weight: bold;
 }
 
-.input-group input[type="text"],
-.input-group input[type="email"],
-.input-group input[type="password"] {
+.input-group select {
     width: calc(100% - 20px);
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1em;
+    box-sizing: border-box;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292%22%20height%3D%22292%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069L146%20210%205%2069z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    padding-right: 30px;
 }
 
-.register-button {
+.submit-button {
     width: 100%;
     padding: 12px;
     background-color: #27ae60;
@@ -66,7 +76,7 @@ body {
     margin-top: 10px;
 }
 
-.register-button:hover {
+.submit-button:hover {
     background-color: #229954;
 }
 
@@ -89,16 +99,16 @@ body {
     border: 1px solid #dc3545;
 }
 
-.login-link, .welcome-link {
+.logout-link {
     margin-top: 20px;
     font-size: 0.9em;
 }
 
-.login-link a, .welcome-link a {
+.logout-link a {
     color: #3498db;
     text-decoration: none;
 }
 
-.login-link a:hover, .welcome-link a:hover {
+.logout-link a:hover {
     text-decoration: underline;
 }
