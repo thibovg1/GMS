@@ -1,3 +1,4 @@
+// afdeling_script.js
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUsernameSpan = document.getElementById('loggedInUsername');
     const selectionForm = document.getElementById('selectionForm');
@@ -6,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const callsignSelect = document.getElementById('callsignSelect');
     const selectionMessage = document.getElementById('selectionMessage');
 
-    // Gesimuleerde data voor dropdowns
     const departmentsData = {
         "Brandweer": {
             "Blussen": ["BRW-001", "BRW-002", "BRW-003"],
@@ -33,12 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
         selectionMessage.classList.remove('success', 'error');
     }
 
-    // Controleer of de gebruiker is ingelogd
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (!loggedInUser) {
-        // Als niet ingelogd, stuur terug naar de loginpagina
-        window.location.href = 'index.html';
-        return; // Stop verdere uitvoering van het script
+        window.location.href = 'index.html'; // Verwijst nu naar de nieuwe index.html (welkomstpagina)
+        return;
     }
     loggedInUsernameSpan.textContent = loggedInUser.username;
 
@@ -76,25 +74,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event Listeners voor dropdowns
     departmentSelect.addEventListener('change', () => {
         const selectedDepartment = departmentSelect.value;
-        specializationSelect.value = ""; // Reset specialisatie
-        callsignSelect.value = ""; // Reset roepnummer
+        specializationSelect.value = "";
+        callsignSelect.value = "";
         populateSpecializations(selectedDepartment);
-        populateCallsigns("", ""); // Leeg roepnummers
+        populateCallsigns("", "");
         hideMessage();
     });
 
     specializationSelect.addEventListener('change', () => {
         const selectedDepartment = departmentSelect.value;
         const selectedSpecialization = specializationSelect.value;
-        callsignSelect.value = ""; // Reset roepnummer
+        callsignSelect.value = "";
         populateCallsigns(selectedDepartment, selectedSpecialization);
         hideMessage();
     });
 
-    // Event Listener voor het formulier
     selectionForm.addEventListener('submit', (e) => {
         e.preventDefault();
         hideMessage();
@@ -108,8 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Sla de selecties op in sessionStorage (of update de bestaande loggedInUser)
-        // Je kunt deze gegevens later ophalen op het dashboard
         const userWithSelections = {
             ...loggedInUser,
             department: selectedDepartment,
@@ -119,10 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionStorage.setItem('loggedInUser', JSON.stringify(userWithSelections));
 
         displayMessage('Sessie gestart! U wordt doorgestuurd...', 'success');
-        // Stuur door naar het dashboard
-        window.location.href = 'admin_dashboard.html';
+        window.location.href = 'admin_dashboard.html'; // Dit leidt nog steeds naar het dashboard
     });
 
-    // Initialiseer afdelingen bij het laden van de pagina
     populateDepartments();
+
+    // Update de uitloglink om naar de nieuwe index.html te verwijzen
+    const logoutLink = document.querySelector('.logout-link a');
+    if (logoutLink) {
+        logoutLink.href = 'index.html'; 
+    }
 });

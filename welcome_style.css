@@ -1,4 +1,4 @@
-/* welcome_style.css */
+/* welcome_style.css (was index_style.css inhoud) */
 body {
     display: flex;
     justify-content: center;
@@ -8,67 +8,96 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-image: url('image.png');
+    background-image: url('image.png'); /* Zorg dat dit pad klopt */
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
 
-.welcome-container {
+.login-container {
     background-color: #ffffff;
     padding: 40px;
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(0,0,0,0.1);
     width: 100%;
-    max-width: 500px;
+    max-width: 400px;
     text-align: center;
 }
 
-.welcome-container h1 {
+.login-container h1 {
     color: #34495e;
-    margin-bottom: 30px;
-    font-size: 2.5em;
+    margin-bottom: 25px;
+    font-size: 2em;
 }
 
-.welcome-container p {
-    margin-bottom: 30px;
-    color: #555;
-    font-size: 1.1em;
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
 }
 
-.button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.welcome-button {
+.input-group label {
     display: block;
-    width: calc(100% - 40px); /* Padding meenemen */
-    padding: 15px 20px;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: bold;
+}
+
+.input-group input[type="text"],
+.input-group input[type="password"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #27ae60;
+    color: white;
     border: none;
     border-radius: 4px;
-    font-size: 1.2em;
+    font-size: 1.1em;
     cursor: pointer;
-    text-decoration: none;
-    color: white;
     transition: background-color 0.3s ease;
-    margin: 0 auto; /* Centreer de knoppen */
+    margin-top: 10px;
 }
 
-.welcome-button:first-child { /* Standaard login knop */
-    background-color: #27ae60;
-}
-
-.welcome-button:first-child:hover {
+.login-button:hover {
     background-color: #229954;
 }
 
-.admin-button { /* Admin login knop */
-    background-color: #3498db;
+.message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
 }
 
-.admin-button:hover {
-    background-color: #2980b9;
+.message.success {
+    background-color: #e6ffe6;
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+
+.message.error {
+    background-color: #ffe6e6;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.register-link, .welcome-link {
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+.register-link a, .welcome-link a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.register-link a:hover, .welcome-link a:hover {
+    text-decoration: underline;
 }
