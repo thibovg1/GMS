@@ -3,18 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welkomstpagina GMS</title>
-    <link rel="stylesheet" href="admin_login_style.css"> 
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="admin_login_style.css">
 </head>
 <body>
-    <div class="welcome-container">
-        <h1>Welkom bij het GMS Systeem!</h1>
-        <p>Dit is een demoversie van het GMS beheersysteem. Er is geen login vereist; iedereen heeft automatisch de rol van 'mod'.</p>
-        <p>U kunt direct naar het dashboard gaan of een nieuw account registreren.</p>
-        <div class="button-group">
-            <a href="admin_dashboard.html">Ga naar Dashboard</a>
-            <a href="register.html">Registreer Nieuw Account</a>
-        </div>
+    <div class="login-container">
+        <h1>Admin Inloggen</h1>
+        
+        <form id="adminLoginForm">
+            <div class="input-group">
+                <label for="adminUsername">Gebruikersnaam:</label>
+                <input type="text" id="adminUsername" name="adminUsername" required>
+            </div>
+            <div class="input-group">
+                <label for="adminPassword">Wachtwoord:</label>
+                <input type="password" id="adminPassword" name="adminPassword" required>
+            </div>
+            <button type="submit" class="login-button">Log In als Admin</button>
+        </form>
+
+        <p id="adminLoginMessage" class="message" style="display:none;"></p>
+        <p class="welcome-link"><a href="welcome_page.html">Terug naar Welkomstpagina</a></p>
     </div>
+    <script src="admin_login_script.js"></script>
 </body>
 </html>
