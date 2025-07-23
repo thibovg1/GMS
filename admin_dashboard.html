@@ -5,139 +5,169 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - GMS</title>
     <link rel="stylesheet" href="admin_dashboard_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <header class="admin-header">
-        <h1>GMS Admin Panel</h1>
-       <nav>
-    <ul>
-        <li><a href="#user-management-section">Gebruikers Beheren</a></li>
-        <li><a href="#admin-management-section">Admins Beheren</a></li>
-        <li><a href="#log-management-section">Logboeken</a></li>
-        <li><a href="#settings-section">Instellingen</a></li>
-        <li><a href="index.html" id="logoutLink">Uitloggen</a></li>
-    </ul>
-</nav>
-    </header>
-
-    <main class="admin-main">
-        <section id="user-management-section" class="user-management">
-            <h2>Gebruikersbeheer (Spelers & Mods)</h2>
-            <p>Hier kunt u de status van reguliere spelersaccounts bekijken en beheren. Nieuwe accounts krijgen automatisch de rol 'user' en zijn in afwachting van goedkeuring.</p>
-            
-            <div class="user-list-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Naam</th>
-                            <th>Gebruikersnaam</th>
-                            <th>E-mail</th>
-                            <th>Rol</th> 
-                            <th>Status</th>
-                            <th>Acties</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody">
-                        
-<tr><td colspan="6" style="text-align: center; padding: 20px; color: #777;">Geen spelersaccounts gevonden.</td></tr>
-                    </tbody>
-                </table>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">GMS Admin</div>
+            <nav>
+                <ul>
+                    <li class="nav-item active" data-section="overview">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </li>
+                    <li class="nav-item" data-section="user-management">
+                        <i class="fas fa-users"></i> Gebruikersbeheer
+                    </li>
+                    <li class="nav-item admin-only" data-section="admin-management">
+                        <i class="fas fa-user-shield"></i> Admin Beheer
+                    </li>
+                    <li class="nav-item" data-section="log-viewer">
+                        <i class="fas fa-clipboard-list"></i> Logboek
+                    </li>
+                    </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <span id="adminUsernameDisplay"></span> (<span id="adminRoleDisplay"></span>)
+                <a href="#" id="logoutLink" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Uitloggen</a>
             </div>
-            
-            <p class="explanation-note"><strong>Let op:</strong> Afgekeurde gebruikers verdwijnen automatisch uit deze lijst.</p>
-        </section>
+        </aside>
 
-        <hr>
+        <main class="main-content">
+            <section id="overview" class="dashboard-section active">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard Overzicht</h2>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Totaal Gebruikers</h3>
+                        <p id="totalUsersCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Open Meldingen</h3>
+                        <p id="openMeldingenCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Actieve Eenheden</h3>
+                        <p id="activeUnitsCount">0</p>
+                    </div>
+                </div>
+                <div class="dashboard-info-cards">
+                    <div class="info-card">
+                        <h3>Recentste Log Activiteiten</h3>
+                        <ul id="recentLogsList">
+                            </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>Status van Hulpdiensten</h3>
+                        <ul id="unitStatusOverview">
+                            </ul>
+                    </div>
+                </div>
+            </section>
 
-        <section id="admin-management-section" class="admin-creation">
+            <section id="user-management" class="dashboard-section">
+                <h2><i class="fas fa-users"></i> Gebruikersbeheer</h2>
+                <div class="table-actions">
+                    <input type="text" id="userSearchInput" placeholder="Zoek gebruiker...">
+                    <select id="userFilterStatus">
+                        <option value="all">Alle Statussen</option>
+                        <option value="pending">In Afwachting</option>
+                        <option value="approved">Goedgekeurd</option>
+                        <option value="rejected">Afgewezen</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="userTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Volledige Naam</th>
+                                <th>Gebruikersnaam</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Status</th>
+                                <th>Acties</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            </tbody>
+                    </table>
+                    <p id="noUsersMessage" class="table-message" style="display:none;">Geen gebruikers gevonden die aan de criteria voldoen.</p>
+                </div>
+            </section>
+
+            <section id="admin-management" class="dashboard-section">
+                <h2><i class="fas fa-user-shield"></i> Admin Beheer</h2>
+                <button id="addAdminButton" class="action-button primary-button"><i class="fas fa-plus"></i> Nieuwe Admin Toevoegen</button>
+                <div class="table-container">
+                    <table class="data-table" id="adminTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Volledige Naam</th>
+                                <th>Gebruikersnaam</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Acties</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody">
+                            </tbody>
+                    </table>
+                    <p id="noAdminsMessage" class="table-message" style="display:none;">Geen admin-accounts gevonden.</p>
+                </div>
+            </section>
+
+            <section id="log-viewer" class="dashboard-section">
+                <h2><i class="fas fa-clipboard-list"></i> Logboek</h2>
+                <div class="table-container">
+                    <table class="data-table" id="logTable">
+                        <thead>
+                            <tr>
+                                <th>Datum/Tijd</th>
+                                <th>Actie</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTableBody">
+                            </tbody>
+                    </table>
+                    <p id="noLogsMessage" class="table-message" style="display:none;">Geen logboekactiviteiten gevonden.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="addAdminModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
             <h2>Nieuwe Admin Toevoegen</h2>
-            <p>Gebruik dit formulier om nieuwe beheerdersaccounts aan te maken. Deze krijgen standaard de rol 'mod'.</p>
-            
             <form id="addAdminForm">
-                <div class="input-group">
-                    <label for="new_admin_username">Gebruikersnaam Admin:</label>
-                    <input type="text" id="new_admin_username" name="new_admin_username" required>
+                <div class="form-group">
+                    <label for="newAdminFullName">Volledige Naam:</label>
+                    <input type="text" id="newAdminFullName" required>
                 </div>
-                <div class="input-group">
-                    <label for="new_admin_password">Wachtwoord Admin:</label>
-                    <input type="password" id="new_admin_password" name="new_admin_password" required>
+                <div class="form-group">
+                    <label for="newAdminUsername">Gebruikersnaam:</label>
+                    <input type="text" id="newAdminUsername" required>
                 </div>
-                <div class="input-group">
-                    <label for="new_admin_confirm_password">Wachtwoord Bevestigen:</label>
-                    <input type="password" id="new_admin_confirm_password" name="new_admin_confirm_password" required>
+                <div class="form-group">
+                    <label for="newAdminEmail">Email:</label>
+                    <input type="email" id="newAdminEmail" required>
                 </div>
-                <button type="submit" class="action-button approve-button">Admin Toevoegen</button>
+                <div class="form-group">
+                    <label for="newAdminPassword">Wachtwoord:</label>
+                    <input type="password" id="newAdminPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newAdminRole">Rol:</label>
+                    <select id="newAdminRole" required>
+                        <option value="admin">Admin</option>
+                        <option value="superadmin">Super Admin</option> </select>
+                </div>
+                <button type="submit" class="primary-button">Admin Toevoegen</button>
+                <p id="addAdminMessage" class="message"></p>
             </form>
-            <p id="adminMessage" class="explanation-note" style="display:none;"></p>
-        </section>
-
-        <hr>
-
-        <section class="admin-list-management">
-            <h2>Bestaande Admins</h2>
-            <p>Beheer hier alle beheerdersaccounts (Superadmin, Admin, Moderator). Rollen kunnen alleen via de console worden gewijzigd.</p>
-            
-            <div class="user-list-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Gebruikersnaam</th>
-                            <th id="adminPasswordHeader">Wachtwoord</th>
-                            <th>Rol</th>
-                            <th>Acties</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminTableBody">
-                        
-</tbody>
-                </table>
-            </div>
-        </section>
-
-        <hr>
-
-        <section id="log-management-section" class="log-management">
-            <h2>Systeemlogboeken</h2>
-            <p>Bekijk hier een overzicht van belangrijke systeemgebeurtenissen en adminacties.</p>
-            
-            <div class="log-list-container">
-                <ul id="logList">
-                    
-</ul>
-            </div>
-            <button id="clearLogsButton" class="action-button reject-button">Logboeken Leegmaken</button>
-        </section>
-
-        <hr>
-
-        <section id="settings-section" class="settings-management">
-            <h2>Algemene Instellingen</h2>
-            <p>Beheer hier algemene applicatie-instellingen. Alleen een superadmin kan deze instellingen wijzigen via de console.</p>
-            
-            <form id="settingsForm">
-                <div class="input-group">
-                    <label for="app_name">Applicatie Naam:</label>
-                    <input type="text" id="app_name" name="app_name" value="GMS App">
-                </div>
-                <div class="input-group">
-                    <label for="max_users">Maximaal aantal gebruikers:</label>
-                    <input type="number" id="max_users" name="max_users" value="1000" min="1">
-                </div>
-                <div class="input-group">
-                    <label for="maintenance_mode">Onderhoudsmodus:</label>
-                    <input type="checkbox" id="maintenance_mode" name="maintenance_mode">
-                    <span style="margin-left: 10px; font-size: 0.9em; color: #555;">(Schakel de applicatie uit voor onderhoud)</span>
-                </div>
-                <button type="submit" class="action-button approve-button">Instellingen Opslaan</button>
-            </form>
-            <p id="settingsMessage" class="explanation-note" style="display:none;"></p>
-        </section>
-        
-    </main>
-
-    <footer class="admin-footer">
-        <p>&copy; 2025 GMS Admin. Alle rechten voorbehouden.</p>
-    </footer>
+        </div>
+    </div>
 
     <script src="admin_dashboard_script.js"></script>
 </body>
