@@ -1,0 +1,316 @@
+/* Algemene body en container styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f7f6;
+    color: #333;
+}
+
+.admin-header {
+    background-color: #2c3e50; /* Donkerblauw */
+    color: #ecf0f1; /* Lichtgrijs */
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.admin-header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+}
+
+.admin-header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.admin-header nav ul li {
+    margin-left: 25px;
+}
+
+.admin-header nav ul li a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.admin-header nav ul li a:hover {
+    color: #3498db; /* Helder blauw */
+}
+
+.admin-main {
+    padding: 40px;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+/* Sectie Styling */
+section {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    /* border-bottom: 1px solid #eee; */ /* Verwijderd omdat <hr> wordt gebruikt */
+}
+
+section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+section h2 {
+    color: #34495e; /* Donkerder blauw */
+    font-size: 2rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #3498db; /* Blauwe onderlijn */
+    padding-bottom: 10px;
+}
+
+/* Horizontale lijn tussen secties */
+hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 40px 0;
+}
+
+
+/* Tabel Styling */
+.user-list-container {
+    overflow-x: auto; /* Zorgt voor scrollen op kleine schermen */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+    vertical-align: middle;
+}
+
+table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+    color: #555;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Status Badges */
+.status-pending {
+    color: #e67e22; /* Oranje */
+    font-weight: bold;
+}
+
+.status-approved {
+    color: #27ae60; /* Groen */
+    font-weight: bold;
+}
+
+.status-rejected {
+    color: #e74c3c; /* Rood */
+    font-weight: bold;
+}
+
+/* Actie Knoppen */
+.action-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-right: 5px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.action-button:last-child {
+    margin-right: 0;
+}
+
+.approve-button {
+    background-color: #28a745; /* Groen */
+    color: white;
+}
+
+.approve-button:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.reject-button {
+    background-color: #dc3545; /* Rood */
+    color: white;
+}
+
+.reject-button:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+.revoke-button {
+    background-color: #ffc107; /* Geel/Oranje */
+    color: #333;
+}
+
+.revoke-button:hover {
+    background-color: #e0a800;
+    transform: translateY(-1px);
+}
+
+/* Formulier Styling */
+.input-group {
+    margin-bottom: 15px;
+    display: flex; /* Maak labels en inputs op één lijn */
+    align-items: center;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0; /* Geen bottom margin meer door flex */
+    margin-right: 15px; /* Ruimte tussen label en input */
+    font-weight: bold;
+    color: #555;
+    min-width: 150px; /* Zorgt voor uitlijning */
+}
+
+.input-group input[type="text"],
+.input-group input[type="password"],
+.input-group input[type="email"],
+.input-group input[type="number"], /* Nieuw voor nummers */
+.input-group select {
+    flex-grow: 1; /* Laat input de resterende ruimte innemen */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.input-group input[type="checkbox"] {
+    width: auto; /* Zorg dat checkbox klein blijft */
+    margin-right: 10px;
+}
+
+
+.input-group select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M2%200L0%202h4L2%200zM2%205L0%203h4L2%205z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 8px 10px;
+    padding-right: 30px;
+}
+
+/* Footer Styling */
+.admin-footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    font-size: 0.9em;
+}
+
+/* Algemene noten/berichten */
+.explanation-note {
+    background-color: #e7f3fe; /* Lichtblauw */
+    border-left: 5px solid #2196F3; /* Blauwe rand */
+    padding: 15px;
+    margin-top: 20px;
+    color: #333;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.explanation-note.error {
+    background-color: #f8d7da; /* Lichtrood */
+    border-color: #dc3545; /* Rood */
+    color: #721c24; /* Donkerrood */
+}
+
+.explanation-note.warning {
+    background-color: #fff3cd; /* Geel */
+    border-color: #ffc107; /* Geel/Oranje */
+    color: #856404; /* Donkergeel */
+}
+
+/* Specifieke styling voor admin wachtwoord cel (als zichtbaar) */
+.admin-password-cell {
+    font-family: 'Courier New', monospace;
+    color: #555; /* Standaard grijs */
+}
+
+/* Styling voor wachtwoorden die verborgen zijn */
+.admin-password-hidden {
+    color: #aaa; /* Lichter grijs om aan te geven dat het verborgen is */
+    font-style: italic;
+}
+
+/* Logboek specifieke styling */
+.log-list-container {
+    background-color: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 15px;
+    max-height: 400px; /* Vaste hoogte */
+    overflow-y: auto; /* Scrollen als er te veel logs zijn */
+    margin-top: 20px;
+}
+
+#logList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#logList li {
+    border-bottom: 1px dotted #e5e5e5;
+    padding: 8px 0;
+    font-size: 0.9em;
+    color: #444;
+}
+
+#logList li:last-child {
+    border-bottom: none;
+}
+
+.log-timestamp {
+    color: #888;
+    font-size: 0.8em;
+    margin-right: 10px;
+    min-width: 150px; /* Zorgt voor uitlijning */
+    display: inline-block;
+}
+
+/* Instellingen specifieke styling */
+.settings-management .input-group {
+    border-bottom: 1px dotted #eee;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.settings-management .input-group:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}

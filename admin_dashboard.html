@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - GMS</title>
+    <link rel="stylesheet" href="admin_dashboard_style.css">
+</head>
+<body>
+    <header class="admin-header">
+        <h1>GMS Admin Panel</h1>
+        <nav>
+            <ul>
+                <li><a href="#user-management-section">Gebruikers Beheren</a></li>
+                <li><a href="#admin-management-section">Admins Beheren</a></li>
+                <li><a href="#log-management-section">Logboeken</a></li>
+                <li><a href="#settings-section">Instellingen</a></li>
+                <li><a href="admin_login.html">Terug naar Welkomstpagina</a></li> 
+            </ul>
+        </nav>
+    </header>
+
+    <main class="admin-main">
+        <section id="user-management-section" class="user-management">
+            <h2>Gebruikersbeheer (Spelers & Mods)</h2>
+            <p>Hier kunt u de status van reguliere spelersaccounts bekijken en beheren. Nieuwe accounts krijgen automatisch de rol 'mod' en zijn goedgekeurd.</p>
+            
+            <div class="user-list-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Naam</th>
+                            <th>Gebruikersnaam</th>
+                            <th>E-mail</th>
+                            <th>Rol</th> 
+                            <th>Status</th>
+                            <th>Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        
+<tr><td colspan="6" style="text-align: center; padding: 20px; color: #777;">Geen spelersaccounts gevonden.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <p class="explanation-note"><strong>Let op:</strong> Afgekeurde gebruikers verdwijnen automatisch uit deze lijst.</p>
+        </section>
+
+        <hr>
+
+        <section id="admin-management-section" class="admin-creation">
+            <h2>Nieuwe Admin Toevoegen</h2>
+            <p>Gebruik dit formulier om nieuwe beheerdersaccounts aan te maken. Deze krijgen standaard de rol 'mod'.</p>
+            
+            <form id="addAdminForm">
+                <div class="input-group">
+                    <label for="new_admin_username">Gebruikersnaam Admin:</label>
+                    <input type="text" id="new_admin_username" name="new_admin_username" required>
+                </div>
+                <div class="input-group">
+                    <label for="new_admin_password">Wachtwoord Admin:</label>
+                    <input type="password" id="new_admin_password" name="new_admin_password" required>
+                </div>
+                <div class="input-group">
+                    <label for="new_admin_confirm_password">Wachtwoord Bevestigen:</label>
+                    <input type="password" id="new_admin_confirm_password" name="new_admin_confirm_password" required>
+                </div>
+                <button type="submit" class="action-button approve-button">Admin Toevoegen</button>
+            </form>
+            <p id="adminMessage" class="explanation-note" style="display:none;"></p>
+        </section>
+
+        <hr>
+
+        <section class="admin-list-management">
+            <h2>Bestaande Admins</h2>
+            <p>Beheer hier alle beheerdersaccounts (Superadmin, Admin, Moderator). Rollen kunnen alleen via de console worden gewijzigd.</p>
+            
+            <div class="user-list-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Gebruikersnaam</th>
+                            <th id="adminPasswordHeader">Wachtwoord</th>
+                            <th>Rol</th>
+                            <th>Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        
+</tbody>
+                </table>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="log-management-section" class="log-management">
+            <h2>Systeemlogboeken</h2>
+            <p>Bekijk hier een overzicht van belangrijke systeemgebeurtenissen en adminacties.</p>
+            
+            <div class="log-list-container">
+                <ul id="logList">
+                    
+</ul>
+            </div>
+            <button id="clearLogsButton" class="action-button reject-button">Logboeken Leegmaken</button>
+        </section>
+
+        <hr>
+
+        <section id="settings-section" class="settings-management">
+            <h2>Algemene Instellingen</h2>
+            <p>Beheer hier algemene applicatie-instellingen. Alleen een superadmin kan deze instellingen wijzigen via de console.</p>
+            
+            <form id="settingsForm">
+                <div class="input-group">
+                    <label for="app_name">Applicatie Naam:</label>
+                    <input type="text" id="app_name" name="app_name" value="GMS App">
+                </div>
+                <div class="input-group">
+                    <label for="max_users">Maximaal aantal gebruikers:</label>
+                    <input type="number" id="max_users" name="max_users" value="1000" min="1">
+                </div>
+                <div class="input-group">
+                    <label for="maintenance_mode">Onderhoudsmodus:</label>
+                    <input type="checkbox" id="maintenance_mode" name="maintenance_mode">
+                    <span style="margin-left: 10px; font-size: 0.9em; color: #555;">(Schakel de applicatie uit voor onderhoud)</span>
+                </div>
+                <button type="submit" class="action-button approve-button">Instellingen Opslaan</button>
+            </form>
+            <p id="settingsMessage" class="explanation-note" style="display:none;"></p>
+        </section>
+        
+    </main>
+
+    <footer class="admin-footer">
+        <p>&copy; 2025 GMS Admin. Alle rechten voorbehouden.</p>
+    </footer>
+
+    <script src="admin_dashboard_script.js"></script>
+</body>
+</html>

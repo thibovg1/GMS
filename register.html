@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Registreren</title>
+    <link rel="stylesheet" href="register_style.css"> </head>
+<body>
+    <div class="register-container">
+        <h1>Registreer Nieuw Account</h1>
+        <form id="registerForm">
+            <div class="input-group">
+                <label for="reg_fullName">Volledige Naam:</label>
+                <input type="text" id="reg_fullName" name="fullName" required>
+            </div>
+            <div class="input-group">
+                <label for="reg_username">Gebruikersnaam:</label>
+                <input type="text" id="reg_username" name="username" required>
+            </div>
+            <div class="input-group">
+                <label for="reg_email">E-mailadres:</label>
+                <input type="email" id="reg_email" name="email" required>
+            </div>
+            <div class="input-group">
+                <label for="reg_password">Wachtwoord:</label>
+                <input type="password" id="reg_password" name="password" required>
+            </div>
+            <div class="input-group">
+                <label for="reg_confirmPassword">Bevestig Wachtwoord:</label>
+                <input type="password" id="reg_confirmPassword" name="confirmPassword" required>
+            </div>
+            <button type="submit" class="register-button">Registreer</button>
+        </form>
+        <p id="registerMessage" class="message" style="display:none;"></p>
+        <p class="login-link">Al een account? <a href="login.html">Log hier in</a></p>
+        <p class="welcome-link"><a href="login.html">Terug naar Welkomstpagina</a></p>
+    </div>
+    <script src="register_script.js"></script> </body>
+</html>

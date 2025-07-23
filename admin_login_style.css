@@ -1,0 +1,60 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f7f6; /* Een fallback kleur voor als de afbeelding niet laadt */
+    font-family: Arial, sans-serif;
+    color: #333;
+    text-align: center;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+
+    /* --- Nieuwe achtergrond foto regels --- */
+    background-image: url('image.png'); /* Pad naar je achtergrondafbeelding */
+    background-size: cover; /* Zorgt ervoor dat de afbeelding de hele achtergrond bedekt */
+    background-position: center center; /* Centreert de afbeelding */
+    background-repeat: no-repeat; /* Voorkomt herhaling van de afbeelding */
+    /* Optioneel: Als je de achtergrond vast wilt zetten tijdens het scrollen */
+    background-attachment: fixed;
+    /* --- Einde nieuwe achtergrond foto regels --- */
+}
+.welcome-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+    /* Optioneel: Voeg een lichte achtergrondtransparantie toe aan de container
+                 zodat de achtergrondafbeelding erdoorheen schijnt. */
+    /* background-color: rgba(255, 255, 255, 0.9); */
+}
+.welcome-container h1 {
+    color: #34495e;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+}
+.welcome-container p {
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+.welcome-container .button-group {
+    margin-top: 30px;
+}
+.welcome-container .button-group a {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+    margin: 10px;
+}
+.welcome-container .button-group a:hover {
+    background-color: #2980b9;
+}

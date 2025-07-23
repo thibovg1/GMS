@@ -1,0 +1,108 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5; /* Een fallback kleur */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+
+    /* --- Achtergrond foto regels --- */
+    background-image: url('image.png'); /* Pad naar je achtergrondafbeelding */
+    background-size: cover; /* Zorgt ervoor dat de afbeelding de hele achtergrond bedekt */
+    background-position: center center; /* Centreert de afbeelding */
+    background-repeat: no-repeat; /* Voorkomt herhaling van de afbeelding */
+    background-attachment: fixed; /* Optioneel: houdt de achtergrond vast tijdens scrollen */
+    /* --- Einde achtergrond foto regels --- */
+}
+
+.register-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 450px; /* Iets breder dan login-container als er meer velden zijn */
+    text-align: center;
+    /* Optioneel: Voeg een lichte achtergrondtransparantie toe aan de container */
+    /* background-color: rgba(255, 255, 255, 0.9); */
+}
+
+.register-container h1 {
+    color: #34495e;
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.input-group {
+    margin-bottom: 15px; /* Iets minder ruimte om meer velden te accommoderen */
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: bold;
+}
+
+.input-group input[type="text"],
+.input-group input[type="email"],
+.input-group input[type="password"] {
+    width: calc(100% - 20px); /* Padding in input meenemen */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.register-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #27ae60; /* Een groene kleur voor registratie */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.register-button:hover {
+    background-color: #229954;
+}
+
+.message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.message.success {
+    background-color: #e6ffe6;
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+
+.message.error {
+    background-color: #ffe6e6;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.login-link, .welcome-link {
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+.login-link a, .welcome-link a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.login-link a:hover, .welcome-link a:hover {
+    text-decoration: underline;
+}
