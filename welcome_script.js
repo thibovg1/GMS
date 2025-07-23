@@ -1,4 +1,3 @@
-// welcome_script.js (was index_script.js inhoud)
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const usernameInput = document.getElementById('username');
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     password: 'adminpassword',
                     role: 'superadmin',
                     email: 'super@admin.com',
-                    status: 'approved'
+                    status: 'approved' // Superadmin is altijd goedgekeurd
                 };
                 allUsers.push(superAdmin);
                 simulatedBackend.saveAllUsers(allUsers);
@@ -46,18 +45,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const allUsers = simulatedBackend.getAllUsers();
                     const user = allUsers.find(u => u.username === username && u.password === password);
 
-                    if (user && user.status === 'approved') {
-                        // Je kunt hier specifiek controleren op 'user' rol als je wilt
-                        // if (user.role !== 'user') {
-                        //     return reject({ success: false, message: 'Dit is geen spelersaccount. Gebruik de admin login.' });
-                        // }
-                        resolve({ success: true, message: 'Login succesvol!', user: { id: user.id, username: user.username, role: user.role } });
-                    } else if (user && user.status === 'pending') {
-                        reject({ success: false, message: 'Je account is nog niet goedgekeurd.' });
-                    } else if (user && user.status === 'rejected') {
-                        reject({ success: false, message: 'Je account is afgekeurd. Neem contact op met de beheerder.' });
-                    }
-                    else {
+                    if (user) {
+                        // Speciale check voor superadmin: altijd toegang als de credentials kloppen
+                        if (user.username === 'superadmin' && user.password === 'adminpassword' && user.role === 'superadmin') {
+                            resolve({ success: true, message: 'Superadmin login succesvol!', user: { id: user.id, username: user.username, role: user.role } });
+                        } 
+                        // Reguliere gebruikers (of andere admins) moeten goedgekeurd zijn
+                        else if (user.status === 'approved') {
+                            resolve({ success: true, message: 'Login succesvol!', user: { id: user.id, username: user.username, role: user.role } });
+                        } else if (user.status === 'pending') {
+                            reject({ success: false, message: 'Je account is nog niet goedgekeurd.' });
+                        } else if (user.status === 'rejected') {
+                            reject({ success: false, message: 'Je account is afgekeurd. Neem contact op met de beheerder.' });
+                        }
+                    } else {
                         reject({ success: false, message: 'Ongeldige gebruikersnaam of wachtwoord.' });
                     }
                 }, 500);

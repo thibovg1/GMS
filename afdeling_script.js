@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Communicatie": ["18-PR-C1", "18-PR-C2"]
         },
         "Meldkamer": {
-            "Algemene Meldkamer": [], // Geen roepnummers voor Meldkamer
+            "Algemene Meldkamer": [],
             "Centralist Noodhulp": [],
             "Centralist Brandweer": [],
             "Centralist Ambulance": [],
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Communicatie Specialist": []
         },
         "Burger": {
-            "Burger Inwoner": [], // Geen roepnummers voor Burger
+            "Burger Inwoner": [],
             "Burger Hulpverlener": [],
             "Getuige": [],
             "Betrokkene": [],
@@ -75,8 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Afdelingen die geen roepnummer invulveld nodig hebben
     const noCallsignDepartments = ["Meldkamer", "Burger"];
-    // Afdelingen die doorgestuurd moeten worden naar afdeling_informatie.html
-    const infoPageDepartments = ["Politie", "Brandweer", "Ambulance", "Prorail"];
+    
+    // DEFINIEER DE HULPDIENSTEN DIE NAAR AFDELING_INFO GAAN
+    const helpdeskDepartments = ["Brandweer", "Politie", "Ambulance", "Prorail"]; 
 
     function displayMessage(message, type) {
         selectionMessage.textContent = message;
@@ -188,27 +189,29 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionStorage.setItem('loggedInUser', JSON.stringify(userWithSelections));
 
         // Opslaan van actieve sessies (voor de meldkamer om op te halen)
-        // Dit is een simpele manier om bij te houden wie ingelogd is
         let allSessions = JSON.parse(sessionStorage.getItem('gms_logged_in_sessions')) || [];
-        // Verwijder de oude sessie van deze gebruiker als die bestaat
         allSessions = allSessions.filter(session => session.id !== userWithSelections.id);
-        allSessions.push(userWithSelections); // Voeg de bijgewerkte sessie toe
+        allSessions.push(userWithSelections);
         sessionStorage.setItem('gms_logged_in_sessions', JSON.stringify(allSessions));
-
 
         displayMessage(`Sessie gestart als ${loggedInUser.username} (${selectedDepartment} - ${selectedSpecialization}${selectedCallsign !== "N.v.t." ? " - " + selectedCallsign : ""})! U wordt doorgestuurd...`, 'success');
         
-        // Logica voor het doorsturen naar de juiste pagina
+        // --- GEWIJZIGDE LOGICA VOOR DOORSTUREN ---
         setTimeout(() => {
             if (selectedDepartment === 'Meldkamer') {
                 window.location.href = 'meldkamer_melding_aanmaken.html'; // Stuur naar meldkamer pagina
-            } else if (infoPageDepartments.includes(selectedDepartment)) {
-                window.location.href = 'afdeling_informatie.html'; // Stuur naar algemene infopagina voor eenheden
+            } else if (helpdeskDepartments.includes(selectedDepartment)) { // GEWIJZIGDE CHECK
+                window.location.href = 'afdeling_info.html'; // Stuur naar algemene infopagina voor hulpdiensten
+            } else if (selectedDepartment === 'Burger') {
+                alert(`Welkom als Burger: ${selectedSpecialization}`);
+                // Optioneel: stuur de burger naar een specifieke 'burger_info.html'
+                // window.location.href = 'burger_info.html';
+                // Voor nu blijft de alert en blijft men op de afdeling selectie pagina.
+                // Of als je wilt, stuur ze naar een algemene "welkom" pagina voor burgers:
+                // window.location.href = 'burger_welcome.html';
             } else {
-                // Voor 'Burger' (of andere toekomstige afdelingen zonder specifieke pagina)
+                // Mocht er een onverwachte afdeling zijn die niet in de bovenstaande categorieën valt
                 alert(`Welkom bij Afdeling: ${selectedDepartment} - ${selectedSpecialization}`);
-                // Optioneel: stuur ze hierheen als er een 'burger_info.html' is
-                // window.location.href = 'burger_info.html'; 
             }
         }, 1500);
     });

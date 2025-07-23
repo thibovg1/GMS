@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afdeling Informatie</title>
+    <link rel="stylesheet" href="afdeling_info_style.css">
+</head>
+<body>
+    <div class="info-container">
+        <h1>Informatie voor Afdeling: <span id="infoDepartmentName"></span></h1>
+        <p><strong>Gebruikersnaam:</strong> <span id="infoUsername"></span></p>
+        <p><strong>Specialisatie:</strong> <span id="infoSpecialization"></span></p>
+        <p><strong>Roepnummer:</strong> <span id="infoCallsign"></span></p>
+        
+        <div class="department-specific-content" id="departmentSpecificContent">
+            </div>
+
+        <div class="incoming-meldingen-section">
+            <h2>Binnenkomende Meldingen</h2>
+            <div id="incomingMeldingenList">
+                <p>Geen openstaande meldingen voor uw eenheid.</p>
+                </div>
+        </div>
+
+        <div class="status-panel-section">
+            <h2>Status & Acties</h2>
+            <div class="status-keypad">
+                <button class="status-button" data-status-code="1">
+                    <span class="code">1</span>
+                    <span class="description">Vrij</span>
+                </button>
+                <button class="status-button" data-status-code="2">
+                    <span class="code">2</span>
+                    <span class="description">Aanrijdend</span>
+                </button>
+                <button class="status-button" data-status-code="3">
+                    <span class="code">3</span>
+                    <span class="description">Ter Plaatse</span>
+                </button>
+                <button class="status-button" data-status-code="4">
+                    <span class="code">4</span>
+                    <span class="description">Bezet</span>
+                </button>
+                <button class="status-button" data-status-code="5">
+                    <span class="code">5</span>
+                    <span class="description">Uitmelden</span>
+                </button>
+                <button class="status-button" data-status-code="6">
+                    <span class="code">6</span>
+                    <span class="description">Spraak</span>
+                </button>
+                <button class="status-button" data-status-code="7">
+                    <span class="code">7</span>
+                    <span class="description">Urgent</span>
+                </button>
+                <button class="status-button" data-status-code="8">
+                    <span class="code">8</span>
+                    <span class="description">Melding</span>
+                </button>
+                <button class="status-button" data-status-code="9">
+                    <span class="code">9</span>
+                    <span class="description">Informatie</span>
+                </button>
+                <button class="status-button" data-status-code="*">
+                    <span class="code">*</span>
+                    <span class="description">Eindrapport</span>
+                </button>
+                <button class="status-button emergency-button" data-status-code="0">
+                    <span class="code">0</span>
+                    <span class="description">Noodknop</span>
+                </button>
+                <button class="status-button" data-status-code="discord">
+                    <span class="code">&#127911;</span> <span class="description">Discord</span>
+                </button>
+            </div>
+            <p id="currentUnitStatus">Huidige status: <span id="displayUnitStatus">Onbekend</span></p>
+            <p id="statusMessage" class="message" style="display:none;"></p>
+        </div>
+        <button id="backToSelection" class="action-button">Terug naar Afdeling Selectie</button>
+        <a href="index.html" class="logout-link">Uitloggen</a>
+    </div>
+    <script src="afdeling_info_script.js"></script>
+</body>
+</html>

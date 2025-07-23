@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminPasswordInput = document.getElementById('adminPassword');
     const adminLoginMessage = document.getElementById('adminLoginMessage');
 
-    // --- Gesimuleerde Backend (Moet consistent zijn met andere scripts) ---
+    // --- Gesimuleerde Backend Functies ---
     const generateUniqueId = () => {
         return Date.now() + Math.floor(Math.random() * 1000);
     };
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     password: 'adminpassword',
                     role: 'superadmin',
                     email: 'super@admin.com',
-                    status: 'approved'
+                    status: 'approved' // Superadmin is altijd goedgekeurd
                 };
                 allUsers.push(superAdmin);
                 simulatedBackend.saveAllUsers(allUsers);
@@ -39,33 +39,34 @@ document.addEventListener('DOMContentLoaded', () => {
         saveAllUsers: (users) => {
             localStorage.setItem('gms_all_users', JSON.stringify(users));
         },
-        // Specifieke login voor admins
-        loginAdmin: (username, password) => {
+        adminLogin: (username, password) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => { // Simuleer netwerkvertraging
                     const allUsers = simulatedBackend.getAllUsers();
-                    const user = allUsers.find(u => u.username === username && u.password === password);
+                    const adminUser = allUsers.find(u => 
+                        u.username === username && u.password === password && 
+                        (u.role === 'admin' || u.role === 'superadmin')
+                    );
 
-                    if (user && user.status === 'approved') {
-                        // Controleer of de rol voldoende is voor admin toegang
-                        const allowedRoles = ['mod', 'admin', 'superadmin'];
-                        if (allowedRoles.includes(user.role)) {
-                            resolve({ success: true, message: 'Admin login succesvol!', user: { id: user.id, username: user.username, role: user.role } });
+                    if (adminUser) {
+                        // Superadmin krijgt altijd toegang als de credentials kloppen, ongeacht de 'status' field
+                        if (adminUser.username === 'superadmin' && adminUser.password === 'adminpassword' && adminUser.role === 'superadmin') {
+                             resolve({ success: true, message: 'Superadmin login succesvol!', admin: { id: adminUser.id, username: adminUser.username, role: adminUser.role } });
+                        } 
+                        // Andere admins moeten goedgekeurd zijn
+                        else if (adminUser.status === 'approved') {
+                            resolve({ success: true, message: 'Admin login succesvol!', admin: { id: adminUser.id, username: adminUser.username, role: adminUser.role } });
                         } else {
-                            reject({ success: false, message: 'Uw account heeft niet de benodigde rechten voor admin toegang.' });
+                            reject({ success: false, message: 'Je admin account is nog niet goedgekeurd of is afgekeurd.' });
                         }
-                    } else if (user && user.status === 'pending') {
-                        reject({ success: false, message: 'Je account is nog niet goedgekeurd.' });
-                    } else if (user && user.status === 'rejected') {
-                        reject({ success: false, message: 'Je account is afgekeurd. Neem contact op met de beheerder.' });
                     } else {
-                        reject({ success: false, message: 'Ongeldige gebruikersnaam of wachtwoord.' });
+                        reject({ success: false, message: 'Ongeldige admin gebruikersnaam of wachtwoord.' });
                     }
                 }, 500);
             });
         }
     };
-    // --- Einde Gesimuleerde Backend ---
+    // --- Einde Gesimuleerde Backend Functies ---
 
     function displayMessage(message, type) {
         adminLoginMessage.textContent = message;
@@ -91,9 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await simulatedBackend.loginAdmin(username, password);
+            const response = await simulatedBackend.adminLogin(username, password);
             if (response.success) {
-                sessionStorage.setItem('loggedInUser', JSON.stringify(response.user));
+                sessionStorage.setItem('loggedInAdmin', JSON.stringify(response.admin));
                 displayMessage(response.message, 'success');
                 window.location.href = 'admin_dashboard.html'; 
             } else {
@@ -105,6 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Zorg ervoor dat de superadmin wordt geïnitialiseerd bij het laden van de loginpagina
+    // Zorg ervoor dat de superadmin bestaat bij het laden van de pagina
     simulatedBackend.getAllUsers();
 });

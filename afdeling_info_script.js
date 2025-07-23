@@ -7,7 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const incomingMeldingenList = document.getElementById('incomingMeldingenList');
     const backToSelectionButton = document.getElementById('backToSelection');
 
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    // NIEUWE ELEMENTEN
+    const statusKeypad = document.querySelector('.status-keypad');
+    const displayUnitStatus = document.getElementById('displayUnitStatus');
+    const statusMessage = document.getElementById('statusMessage');
+
+    let loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
 
     if (!loggedInUser || !loggedInUser.department) {
         window.location.href = 'afdeling.html';
@@ -18,6 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
     infoUsername.textContent = loggedInUser.username;
     infoSpecialization.textContent = loggedInUser.specialization;
     infoCallsign.textContent = loggedInUser.callsign || 'N.v.t.';
+
+    // Initialiseer de status als deze nog niet bestaat
+    if (!loggedInUser.unitStatus) {
+        loggedInUser.unitStatus = 'Onbekend';
+        sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+        updateSessionStatus(loggedInUser.id, 'Onbekend');
+    }
+    displayUnitStatus.textContent = loggedInUser.unitStatus;
+
 
     function loadDepartmentContent(department) {
         let content = '';
@@ -93,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const meldingDiv = document.createElement('div');
                 meldingDiv.className = 'melding-item';
                 // Voorkom dat geaccepteerde/afgewezen meldingen knoppen hebben of verander hun weergave
-                const buttonsHtml = (melding.status === 'Geaccepteerd' || melding.status === 'Afgewezen')
+                const buttonsHtml = (melding.status === 'Geaccepteerd' || melding.status === 'Afgewezen' || melding.status === 'Afgehandeld')
                     ? `<p class="melding-status-detail">Actie: ${melding.status}</p>`
                     : `<button class="button acknowledge-button" data-melding-id="${melding.id}">Accepteren</button>
                        <button class="button reject-button" data-melding-id="${melding.id}">Afwijzen</button>`;
@@ -174,17 +188,101 @@ document.addEventListener('DOMContentLoaded', () => {
             allSessions[currentSessionIndex].specialization = undefined;
             allSessions[currentSessionIndex].callsign = undefined;
             allSessions[currentSessionIndex].currentMeldingen = []; // Leeg de meldingen voor deze sessie
+            allSessions[currentSessionIndex].unitStatus = 'Onbekend'; // Reset ook de status
             sessionStorage.setItem('gms_logged_in_sessions', JSON.stringify(allSessions));
         }
 
         window.location.href = 'afdeling.html';
     });
 
+    // --- NIEUWE STATUS KNOP FUNCTIONALITEIT ---
+    const statusMap = {
+        '1': 'Vrij',
+        '2': 'Aanrijdend',
+        '3': 'Ter Plaatse',
+        '4': 'Bezet',
+        '5': 'Uitmelden',
+        '6': 'Spraak',
+        '7': 'Urgent',
+        '8': 'Melding',
+        '9': 'Informatie',
+        '*': 'Eindrapport',
+        '0': 'Noodknop',
+        'discord': 'Discord'
+    };
+
+    function displayStatusMessage(message, type) {
+        statusMessage.textContent = message;
+        statusMessage.className = `message ${type}`;
+        statusMessage.style.display = 'block';
+        setTimeout(() => {
+            statusMessage.style.display = 'none';
+        }, 3000); // Verberg bericht na 3 seconden
+    }
+
+    function updateUnitGlobalStatus(newStatus, unitId, username, callsign) {
+        let allSessions = JSON.parse(sessionStorage.getItem('gms_logged_in_sessions')) || [];
+        const targetSessionIndex = allSessions.findIndex(session => session.id === unitId);
+
+        if (targetSessionIndex !== -1) {
+            allSessions[targetSessionIndex].unitStatus = newStatus;
+            sessionStorage.setItem('gms_logged_in_sessions', JSON.stringify(allSessions));
+            console.log(`Status van ${username} (${callsign}) bijgewerkt naar: ${newStatus}`);
+
+            // Update ook de 'loggedInUser' in de huidige sessie
+            loggedInUser.unitStatus = newStatus;
+            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+            displayUnitStatus.textContent = newStatus;
+            displayStatusMessage(`Status bijgewerkt naar: ${newStatus}`, 'success');
+
+        } else {
+            console.error(`Sessie voor eenheid ID ${unitId} niet gevonden.`);
+            displayStatusMessage('Fout: Kon status niet bijwerken in sessie.', 'error');
+        }
+    }
+
+    statusKeypad.addEventListener('click', (e) => {
+        const button = e.target.closest('.status-button');
+        if (button) {
+            const statusCode = button.dataset.statusCode;
+            const statusDescription = statusMap[statusCode] || 'Onbekend';
+
+            if (statusCode === '0') { // Noodknop
+                const confirmEmergency = confirm(`WEET U ZEKER DAT U DE NOODKNOP WILT INDIENEN? Dit stuurt een alarm naar de meldkamer!`);
+                if (confirmEmergency) {
+                    updateUnitGlobalStatus('NOOD', loggedInUser.id, loggedInUser.username, loggedInUser.callsign);
+                    alert('Noodsignaal verstuurd naar meldkamer!');
+                    // Hier kun je extra logica toevoegen, bijv. naar een noodscherm navigeren of een API call doen
+                } else {
+                    displayStatusMessage('Noodknop geannuleerd.', 'info');
+                }
+            } else if (statusCode === 'discord') {
+                // Hier kun je een link openen of een specifieke Discord-functie triggeren
+                alert('Discord functionaliteit (nog) niet geïmplementeerd.');
+                // window.open('https://discord.com/jouw-server-link', '_blank'); // Voorbeeld om Discord te openen
+                displayStatusMessage('Verbinden met Discord...', 'info');
+            } else if (statusCode === '*') {
+                 // Eindrapport functionaliteit
+                alert('Eindrapport functionaliteit (nog) niet geïmplementeerd.');
+                displayStatusMessage('Eindrapport wordt voorbereid...', 'info');
+            }
+            else {
+                updateUnitGlobalStatus(statusDescription, loggedInUser.id, loggedInUser.username, loggedInUser.callsign);
+            }
+        }
+    });
+    // --- EINDE NIEUWE STATUS KNOP FUNCTIONALITEIT ---
+
+
     // Render de meldingen direct bij het laden van de pagina
     renderIncomingMeldingen();
 
-    // Optioneel: Ververs meldingen periodiek (bijv. elke 5 seconden)
-    // Dit simuleert een 'live' update. In een echte app zou je WebSockets gebruiken
-    // voor directe, efficiënte updates.
-    setInterval(renderIncomingMeldingen, 5000); 
+    // Ververs meldingen en status periodiek (bijv. elke 5 seconden)
+    // Dit is belangrijk voor de eenheid om updates te ontvangen van de meldkamer
+    setInterval(() => {
+        // Herlaad loggedInUser om de meest recente status uit sessionStorage te krijgen
+        loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        displayUnitStatus.textContent = loggedInUser.unitStatus || 'Onbekend'; // Update de weergegeven status
+        renderIncomingMeldingen();
+    }, 5000); 
 });

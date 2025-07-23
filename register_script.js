@@ -1,8 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
+    const fullNameInput = document.getElementById('reg_fullName');
+    const usernameInput = document.getElementById('reg_username');
+    const emailInput = document.getElementById('reg_email');
+    const passwordInput = document.getElementById('reg_password');
+    const confirmPasswordInput = document.getElementById('reg_confirmPassword');
     const registerMessage = document.getElementById('registerMessage');
 
-    // --- Gesimuleerde Backend (gelijk aan die in andere scripts) ---
+    // --- Gesimuleerde Backend Functies ---
     const generateUniqueId = () => {
         return Date.now() + Math.floor(Math.random() * 1000);
     };
@@ -10,7 +15,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const simulatedBackend = {
         getAllUsers: () => {
             const storedAllUsers = localStorage.getItem('gms_all_users');
-            return storedAllUsers ? JSON.parse(storedAllUsers) : [];
+            let allUsers = [];
+
+            if (storedAllUsers) {
+                allUsers = JSON.parse(storedAllUsers);
+            }
+
+            // Zorgt ervoor dat de superadmin altijd bestaat bij het laden van de pagina
+            const superAdminExists = allUsers.some(user => user.username === 'superadmin' && user.role === 'superadmin');
+            if (!superAdminExists) {
+                const superAdmin = {
+                    id: generateUniqueId(),
+                    fullName: 'Super Admin',
+                    username: 'superadmin',
+                    password: 'adminpassword',
+                    role: 'superadmin',
+                    email: 'super@admin.com',
+                    status: 'approved' // Superadmin is ALTIJD goedgekeurd
+                };
+                allUsers.push(superAdmin);
+                simulatedBackend.saveAllUsers(allUsers);
+            }
+            
+            return allUsers;
         },
         saveAllUsers: (users) => {
             localStorage.setItem('gms_all_users', JSON.stringify(users));
@@ -18,9 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
         registerUser: (fullName, username, email, password) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => { // Simuleer netwerkvertraging
-                    let allUsers = simulatedBackend.getAllUsers();
-
-                    // Controleer of gebruikersnaam of e-mail al bestaat
+                    const allUsers = simulatedBackend.getAllUsers();
+                    
+                    // Controleer op unieke gebruikersnaam en e-mail
                     if (allUsers.some(user => user.username === username)) {
                         return reject({ success: false, message: 'Gebruikersnaam bestaat al.' });
                     }
@@ -30,22 +57,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const newUser = {
                         id: generateUniqueId(),
-                        fullName: fullName,
-                        username: username,
-                        email: email,
-                        password: password,
-                        role: 'user', // STANDAARD ROL IS NU 'USER'
-                        status: 'pending' // Nieuwe gebruikers zijn in afwachting van goedkeuring
+                        fullName,
+                        username,
+                        email,
+                        password, // In een echte app: hashen!
+                        role: 'user', // Standaardrol voor nieuwe registraties
+                        status: 'pending' // Nieuwe accounts moeten goedgekeurd worden door een admin
                     };
-
                     allUsers.push(newUser);
                     simulatedBackend.saveAllUsers(allUsers);
-                    resolve({ success: true, message: 'Registratie succesvol!' }); // Boodschap aangepast
+                    resolve({ success: true, message: 'Registratie succesvol! Wacht op goedkeuring door een beheerder.' });
                 }, 500);
             });
         }
     };
-    // --- Einde Gesimuleerde Backend ---
+    // --- Einde Gesimuleerde Backend Functies ---
 
     function displayMessage(message, type) {
         registerMessage.textContent = message;
@@ -62,11 +88,21 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         hideMessage();
 
-        const fullName = document.getElementById('reg_fullName').value;
-        const username = document.getElementById('reg_username').value;
-        const email = document.getElementById('reg_email').value;
-        const password = document.getElementById('reg_password').value;
-        const confirmPassword = document.getElementById('reg_confirmPassword').value;
+        const fullName = fullNameInput.value.trim();
+        const username = usernameInput.value.trim();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (!fullName || !username || !email || !password || !confirmPassword) {
+            displayMessage('Vul alstublieft alle velden in.', 'error');
+            return;
+        }
+
+        if (password.length < 6) {
+            displayMessage('Wachtwoord moet minimaal 6 tekens lang zijn.', 'error');
+            return;
+        }
 
         if (password !== confirmPassword) {
             displayMessage('Wachtwoorden komen niet overeen.', 'error');
@@ -77,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await simulatedBackend.registerUser(fullName, username, email, password);
             if (response.success) {
                 displayMessage(response.message, 'success');
-                registerForm.reset(); // Leeg het formulier na succesvolle registratie
+                registerForm.reset();
             } else {
                 displayMessage(response.message, 'error');
             }
@@ -86,4 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Registratie fout:', error);
         }
     });
+
+    // Zorg ervoor dat de superadmin bestaat bij het laden van de pagina
+    simulatedBackend.getAllUsers();
 });
