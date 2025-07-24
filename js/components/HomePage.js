@@ -1,6 +1,6 @@
-// src/components/HomePage.js
+// js/components/HomePage.js
 import React from 'react';
-import { PhoneCallIcon, UsersIcon, BellRingIcon } from '../icons'; // Assuming icons are in a separate file or directly imported as SVG
+import { PhoneCallIcon, UsersIcon, BellRingIcon } from '../icons.js'; // Import icons
 
 const HomePage = ({ onNavigate }) => (
     <div className="flex flex-col items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-2xl max-w-4xl mx-auto mt-12 border border-gray-700">

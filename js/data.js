@@ -1,4 +1,4 @@
-// src/data.js
+// js/data.js
 
 export const departmentsList = ['Politie', 'Kmar', 'Brandweer', 'Ambulance', 'Prorail', 'Meldkamer', 'Burger'];
 

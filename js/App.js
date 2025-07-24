@@ -1,13 +1,13 @@
-// src/App.js
+// js/App.js
 import React, { useState, useEffect, createContext } from 'react';
-import { LogOutIcon, UserCogIcon } from './icons'; // Import icons
-import Login from './components/Login';
-import Register from './components/Register';
-import HomePage from './components/HomePage';
-import CitizenPage from './components/CitizenPage';
-import EmergencyServicePage from './components/EmergencyServicePage';
-import ControlRoomPage from './components/ControlRoomPage';
-import AdminPage from './components/AdminPage';
+import { LogOutIcon, UserCogIcon } from './icons.js'; // Import icons
+import Login from './components/Login.js';
+import Register from './components/Register.js';
+import HomePage from './components/HomePage.js';
+import CitizenPage from './components/CitizenPage.js';
+import EmergencyServicePage from './components/EmergencyServicePage.js';
+import ControlRoomPage from './components/ControlRoomPage.js';
+import AdminPage from './components/AdminPage.js';
 
 // Context for app state
 export const AppContext = createContext(null);

@@ -1,4 +1,4 @@
-// src/components/Modal.js
+// js/components/Modal.js
 import React from 'react';
 
 // Custom Modal Component (instead of alert/confirm)

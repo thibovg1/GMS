@@ -1,6 +1,6 @@
-// src/components/Login.js
+// js/components/Login.js
 import React, { useState } from 'react';
-import { LogInIcon, UserPlusIcon } from '../icons'; // Assuming icons are in a separate file or directly imported as SVG
+import { LogInIcon, UserPlusIcon } from '../icons.js'; // Import icons
 
 const Login = ({ onLoginSuccess, onNavigateToRegister, appData }) => {
     const [email, setEmail] = useState('');

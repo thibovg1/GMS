@@ -1,9 +1,9 @@
-// src/components/ControlRoomPage.js
+// js/components/ControlRoomPage.js
 import React, { useState, useEffect, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import Modal from './Modal'; // Import Modal component
-import { AppContext } from '../App'; // Import AppContext
-import { BellRingIcon, UsersIcon, MessageSquareIcon, PlusCircleIcon, ListIcon, InfoIcon, MapPinIcon, CircleDotIcon, EditIcon } from '../icons'; // Assuming icons are in a separate file or directly imported as SVG
+import Modal from './Modal.js'; // Import Modal component
+import { AppContext } from '../App.js'; // Import AppContext
+import { BellRingIcon, UsersIcon, MessageSquareIcon, PlusCircleIcon, ListIcon, InfoIcon, MapPinIcon, CircleDotIcon, EditIcon } from '../icons.js'; // Import icons
 
 const ControlRoomPage = () => {
     const { userId, appData, setAppData } = useContext(AppContext);

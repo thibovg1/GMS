@@ -1,0 +1,10 @@
+/* css/style.css */
+
+/* Custom styles for the Inter font */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Eventuele extra, niet-Tailwind specifieke CSS kan hier worden toegevoegd */
+/* Bijvoorbeeld, als u specifieke overgangen of animaties wilt die niet direct met Tailwind classes kunnen. */
+/* Voor deze app is de meeste styling al via Tailwind classes in de JS/JSX bestanden gedaan. */

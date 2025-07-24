@@ -1,9 +1,9 @@
-// src/components/CitizenPage.js
+// js/components/CitizenPage.js
 import React, { useState, useEffect, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import Modal from './Modal'; // Import Modal component
-import { AppContext } from '../App'; // Import AppContext
-import { PhoneCallIcon, InfoIcon, ListIcon, MapPinIcon } from '../icons'; // Assuming icons are in a separate file or directly imported as SVG
+import Modal from './Modal.js'; // Import Modal component
+import { AppContext } from '../App.js'; // Import AppContext
+import { PhoneCallIcon, InfoIcon, ListIcon, MapPinIcon } from '../icons.js'; // Import icons
 
 const CitizenPage = () => {
     const { userId, appData, setAppData } = useContext(AppContext);
